@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-shield",
+      "description": "Abstract blue shield protection concept",
+      "imageUrl": "https://picsum.photos/seed/vishwaas-shield/1200/800",
+      "imageHint": "security protection"
+    },
+    {
+      "id": "user-avatar-1",
+      "description": "User profile picture",
+      "imageUrl": "https://picsum.photos/seed/user1/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "user-avatar-2",
+      "description": "User profile picture",
+      "imageUrl": "https://picsum.photos/seed/user2/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "scam-example",
+      "description": "Scam call visual representation",
+      "imageUrl": "https://picsum.photos/seed/scam/400/300",
+      "imageHint": "suspicious phone"
+    }
+  ]
 }
