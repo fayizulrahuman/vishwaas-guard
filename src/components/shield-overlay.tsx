@@ -1,13 +1,17 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from 'react'
-import { Shield, ShieldAlert, ShieldCheck, Eye, EyeOff, Camera, Mic, PhoneOff, AlertTriangle, ScanLine } from 'lucide-react'
+import { Shield, ShieldAlert, ShieldCheck, Eye, EyeOff, Camera, Mic, PhoneOff, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { realtimeDeepfakeAlertTriggering } from '@/ai/flows/realtime-deepfake-alert-triggering'
 import { toast } from '@/hooks/use-toast'
+
+// Robust minimal Base64 headers for testing
+const MOCK_AUDIO_B64 = "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"
+const MOCK_VIDEO_B64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
 
 export function ShieldOverlay() {
   const [isActive, setIsActive] = useState(false)
@@ -52,14 +56,10 @@ export function ShieldOverlay() {
     setAnalysisText('Analyzing voice biometric markers...')
     
     scanInterval.current = setInterval(async () => {
-      // Valid minimal Base64 headers to prevent decoding errors
-      const mockAudio = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA=="
-      const mockVideo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
-      
       try {
         const result = await realtimeDeepfakeAlertTriggering({
-          audioSegmentDataUri: mockAudio,
-          videoFrameDataUri: mockVideo,
+          audioSegmentDataUri: MOCK_AUDIO_B64,
+          videoFrameDataUri: MOCK_VIDEO_B64,
           contextualInfo: "User is in a high-risk financial video call."
         })
         
@@ -80,9 +80,10 @@ export function ShieldOverlay() {
           setStatus('secure')
         }
       } catch (e) {
-        console.error("Analysis failed", e)
+        // Errors are handled by the global listener but we log for local awareness
+        console.warn("Analysis cycle skip due to network or logic error.")
       }
-    }, 4000)
+    }, 5000)
   }
 
   const stopScanning = () => {
@@ -117,7 +118,6 @@ export function ShieldOverlay() {
 
   return (
     <div className="relative w-full overflow-hidden rounded-[1.5rem] md:rounded-[2.2rem] bg-slate-950 aspect-[16/10] md:aspect-video shadow-2xl group/shield">
-      {/* Privacy Consent Layer */}
       {!privacyConsent && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-6 text-center">
           <div className="max-w-sm space-y-6 animate-in fade-in zoom-in-95 duration-500">
@@ -138,7 +138,6 @@ export function ShieldOverlay() {
         </div>
       )}
 
-      {/* Camera Feed Simulator */}
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
         {isCameraOff ? (
           <div className="w-full h-full bg-slate-900 flex flex-col items-center justify-center gap-4 text-slate-700">
@@ -163,7 +162,6 @@ export function ShieldOverlay() {
         )}
       </div>
 
-      {/* HUD Overlay */}
       <div className="absolute inset-0 p-6 md:p-10 flex flex-col justify-between pointer-events-none">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-2">

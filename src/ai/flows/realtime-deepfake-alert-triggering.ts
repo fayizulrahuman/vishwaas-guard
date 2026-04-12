@@ -1,8 +1,7 @@
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for real-time deepfake alert triggering.
- * It takes audio and video metadata, calculates a deepfake probability using Gemini 2.5 Flash,
- * and returns the probability along with an explanation.
+ * It takes audio and video metadata and returns a deepfake probability analysis.
  *
  * - realtimeDeepfakeAlertTriggering - A function that initiates the deepfake probability calculation.
  * - RealtimeDeepfakeAlertTriggeringInput - The input type for the flow.
@@ -54,22 +53,22 @@ export async function realtimeDeepfakeAlertTriggering(
   return realtimeDeepfakeAlertTriggeringFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'deepfakeProbabilityPrompt',
+const realtimePrompt = ai.definePrompt({
+  name: 'realtimeDeepfakeAlertTriggeringPrompt',
   input: {schema: RealtimeDeepfakeAlertTriggeringInputSchema},
   output: {schema: RealtimeDeepfakeAlertTriggeringOutputSchema},
+  model: 'googleai/gemini-1.5-flash',
   prompt: `You are an expert deepfake detection system. Your task is to analyze provided audio and video metadata to determine the probability of it being a deepfake.
 
 Analyze the following: 
 - Audio: {{media url=audioSegmentDataUri}}
 - Video Frame: {{media url=videoFrameDataUri}}
 
-{{{contextualInfo}}}
+Context: {{{contextualInfo}}}
 
 Based on the analysis, provide a deepfake probability between 0 and 1, where 1 indicates a very high likelihood of a deepfake, and 0 indicates no likelihood. Also, provide a concise explanation for your determination.
 
-Consider anomalies, inconsistencies, and any other indicators commonly associated with deepfake technology in both audio and video.
-`,
+Consider anomalies, inconsistencies, and any other indicators commonly associated with deepfake technology in both audio and video.`,
 });
 
 const realtimeDeepfakeAlertTriggeringFlow = ai.defineFlow(
@@ -79,8 +78,10 @@ const realtimeDeepfakeAlertTriggeringFlow = ai.defineFlow(
     outputSchema: RealtimeDeepfakeAlertTriggeringOutputSchema,
   },
   async input => {
-    // Calling the executable prompt directly for Genkit 1.x compliance
-    const {output} = await prompt(input);
-    return output!;
+    const {output} = await realtimePrompt(input);
+    if (!output) {
+      throw new Error('Analysis failed.');
+    }
+    return output;
   }
 );
