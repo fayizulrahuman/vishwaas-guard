@@ -92,7 +92,6 @@ export function AuthScreen() {
     }
     setLoading(true);
     
-    // Clean phone number: remove any non-digit characters
     const cleanedPhone = phone.replace(/\D/g, '');
     const fullPhoneNumber = countryCode + cleanedPhone;
 
@@ -115,8 +114,8 @@ export function AuthScreen() {
         description: `A verification code has been sent to ${fullPhoneNumber}.` 
       });
     } catch (error: any) {
-      // If recaptcha fails because it was cleared or expired, reset ref
-      recaptchaVerifierRef.current = null;
+      // Don't nullify the ref here, as the element is already rendered
+      // Only clear if we absolutely have to restart
       toast({ 
         title: "Failed to send OTP", 
         description: error.message, 
@@ -134,7 +133,6 @@ export function AuthScreen() {
     
     try {
       await confirmationResult.confirm(otp);
-      // Success will be handled by auth state observer
     } catch (error: any) {
       toast({ 
         title: "Verification Failed", 
@@ -147,7 +145,6 @@ export function AuthScreen() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F5F5F7] p-6">
-      {/* Invisible reCAPTCHA anchor */}
       <div id="recaptcha-container"></div>
       
       <div className="w-full max-w-[440px] space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
