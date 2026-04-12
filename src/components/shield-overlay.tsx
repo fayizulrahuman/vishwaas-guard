@@ -52,8 +52,9 @@ export function ShieldOverlay() {
     setAnalysisText('Analyzing voice biometric markers...')
     
     scanInterval.current = setInterval(async () => {
-      const mockAudio = "data:audio/wav;base64,UklGRi..."
-      const mockVideo = "data:image/jpeg;base64,/9j/4AAQ..."
+      // Valid minimal Base64 headers to prevent decoding errors
+      const mockAudio = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA=="
+      const mockVideo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
       
       try {
         const result = await realtimeDeepfakeAlertTriggering({
