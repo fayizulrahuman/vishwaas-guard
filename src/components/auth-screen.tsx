@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Shield, Mail, Smartphone, ArrowRight, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Shield, Mail, Smartphone, ArrowRight, Loader2, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,14 +10,24 @@ import { useAuth } from '@/firebase';
 import { GoogleIcon } from '@/components/icons/google-icon';
 import { initiateAnonymousSignIn, initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { toast } from '@/hooks/use-toast';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
 export function AuthScreen() {
   const auth = useAuth();
-  const [method, setMethod] = useState<'options' | 'email' | 'phone'>('options');
+  const [method, setMethod] = useState<'options' | 'email' | 'phone' | 'otp'>('options');
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
+  const [confirmationResult, setConfirmationResult] = useState<any>(null);
+
+  // Initialize reCAPTCHA on the client
+  useEffect(() => {
+    return () => {
+      // Cleanup any reCAPTCHA widgets if necessary
+    };
+  }, []);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -39,17 +49,65 @@ export function AuthScreen() {
     e.preventDefault();
     if (!email || !password) return;
     setLoading(true);
-    initiateEmailSignIn(auth, email, password);
-    // Note: Success is handled by the useUser hook in the parent
+    initiateEmailSignIn(auth, email, password, () => setLoading(false));
   };
 
   const handleGuestLogin = () => {
     setLoading(true);
-    initiateAnonymousSignIn(auth);
+    initiateAnonymousSignIn(auth, () => setLoading(false));
+  };
+
+  const handleSendOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phone) return;
+    setLoading(true);
+    
+    try {
+      // Create invisible reCAPTCHA verifier
+      const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+      });
+      
+      const result = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
+      setConfirmationResult(result);
+      setMethod('otp');
+      toast({ 
+        title: "OTP Sent", 
+        description: "A verification code has been sent to your phone." 
+      });
+    } catch (error: any) {
+      toast({ 
+        title: "Failed to send OTP", 
+        description: error.message, 
+        variant: "destructive" 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp || !confirmationResult) return;
+    setLoading(true);
+    
+    try {
+      await confirmationResult.confirm(otp);
+      // Success will be handled by auth state observer
+    } catch (error: any) {
+      toast({ 
+        title: "Verification Failed", 
+        description: "The code you entered is invalid or has expired.", 
+        variant: "destructive" 
+      });
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F5F5F7] p-6">
+      <div id="recaptcha-container"></div>
+      
       <div className="w-full max-w-[440px] space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
         <div className="text-center space-y-2">
           <div className="flex justify-center mb-6">
@@ -67,9 +125,12 @@ export function AuthScreen() {
               {method === 'options' && "Welcome Back"}
               {method === 'email' && "Sign in with Email"}
               {method === 'phone' && "Sign in with Phone"}
+              {method === 'otp' && "Verify Your Identity"}
             </CardTitle>
             <CardDescription className="text-center">
-              Choose your preferred secure login method.
+              {method === 'otp' 
+                ? `Enter the 6-digit code sent to ${phone}`
+                : "Choose your preferred secure login method."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pb-10">
@@ -162,24 +223,57 @@ export function AuthScreen() {
             )}
 
             {method === 'phone' && (
-              <div className="space-y-4">
+              <form onSubmit={handleSendOTP} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
                   <Input 
                     id="phone" 
                     type="tel" 
-                    placeholder="+1 (555) 000-0000" 
+                    placeholder="+15550000000" 
                     className="h-12 rounded-xl border-border bg-slate-50/50"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
                   />
                 </div>
-                <Button onClick={() => toast({ title: "OTP Sent", description: "Verification code sent to your phone." })} className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 font-bold gap-2">
-                  Send OTP Code
-                  <ArrowRight className="h-4 w-4" />
+                <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 font-bold gap-2" disabled={loading}>
+                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Send OTP Code"}
+                  {!loading && <ArrowRight className="h-4 w-4" />}
                 </Button>
-                <Button variant="ghost" onClick={() => setMethod('options')} className="w-full rounded-xl text-muted-foreground">
+                <Button variant="ghost" onClick={() => setMethod('options')} className="w-full rounded-xl text-muted-foreground" disabled={loading}>
                   Back to options
                 </Button>
-              </div>
+              </form>
+            )}
+
+            {method === 'otp' && (
+              <form onSubmit={handleVerifyOTP} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="otp">Verification Code</Label>
+                  <Input 
+                    id="otp" 
+                    type="text" 
+                    placeholder="000000" 
+                    maxLength={6}
+                    className="h-12 rounded-xl border-border bg-slate-50/50 text-center tracking-[1em] text-lg font-bold"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 font-bold gap-2" disabled={loading}>
+                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Verify & Continue"}
+                  {!loading && <KeyRound className="h-4 w-4" />}
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setMethod('phone')} 
+                  className="w-full rounded-xl text-muted-foreground" 
+                  disabled={loading}
+                >
+                  Change phone number
+                </Button>
+              </form>
             )}
           </CardContent>
         </Card>
