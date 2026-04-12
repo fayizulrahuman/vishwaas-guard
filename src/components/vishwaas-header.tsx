@@ -25,7 +25,7 @@ import { toast } from "@/hooks/use-toast"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import Image from "next/image"
-import { PlaceHolderImages } from "@/app/lib/placeholder-images"
+import { PlaceHolderImages } from "@/lib/placeholder-images"
 import { 
   ResponsiveContainer,
   Area,
@@ -52,7 +52,9 @@ const VAULT_ITEMS = [
 export function VishwaasHeader() {
   const auth = useAuth();
   const { user } = useUser();
-  const logo = PlaceHolderImages.find(img => img.id === 'vishwaas-logo');
+  
+  // Defensive check for PlaceHolderImages and find the logo
+  const logo = PlaceHolderImages?.find(img => img.id === 'vishwaas-logo');
   
   const [profileOpen, setProfileOpen] = useState(false);
   const [vaultOpen, setVaultOpen] = useState(false);
@@ -82,7 +84,7 @@ export function VishwaasHeader() {
                 alt="Vishwaas Guard Logo" 
                 fill 
                 className="object-contain"
-                data-ai-hint="shield logo"
+                priority
               />
             ) : (
               <Shield className="h-8 w-8 text-primary" />
@@ -219,7 +221,7 @@ export function VishwaasHeader() {
         </DialogContent>
       </Dialog>
 
-      {/* Activity Modal */}
+      {/* Activity Analysis Modal */}
       <Dialog open={activityOpen} onOpenChange={setActivityOpen}>
         <DialogContent className="glass-panel max-w-4xl p-10 border-white/20 shadow-2xl overflow-hidden">
           <DialogHeader className="space-y-2">
