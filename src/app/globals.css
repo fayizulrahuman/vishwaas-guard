@@ -45,7 +45,7 @@
 }
 
 .glass-panel {
-  @apply frosted-glass rounded-[20px];
+  @apply frosted-glass rounded-[24px];
 }
 
 /* --- Background Spheres --- */
@@ -75,9 +75,19 @@
   animation: float 10s ease-in-out infinite;
 }
 
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
 .active-protection-glow {
   @apply text-[#DFFF00] font-black tracking-widest; /* Lime Green/Yellow */
   text-shadow: 0 0 10px rgba(223, 255, 0, 0.5);
+}
+
+.glow-dot {
+  @apply h-2 w-2 rounded-full bg-[#DFFF00];
+  animation: pulse-glow 2s infinite ease-in-out;
 }
 
 .metallic-ring {
@@ -92,6 +102,19 @@
   @apply rounded-full p-[2px];
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
+}
+
+.scanline {
+  @apply absolute left-0 right-0 h-[2px] bg-primary/40 z-10 pointer-events-none;
+  animation: scan 3s linear infinite;
+  box-shadow: 0 0 15px rgba(0, 102, 255, 0.5);
+}
+
+@keyframes scan {
+  0% { top: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
 }
 
 .custom-scrollbar::-webkit-scrollbar {

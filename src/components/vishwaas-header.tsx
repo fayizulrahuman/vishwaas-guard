@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react"
-import { Shield, Bell, User, LogOut, Settings, Vault, Fingerprint, Mic, ScanFace, Lock, FileAudio, FileVideo, TrendingUp, Sparkles } from "lucide-react"
+import { Shield, Bell, User, LogOut, Settings, Vault, Fingerprint, Mic, ScanFace, TrendingUp, Sparkles, FileAudio, FileVideo } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { 
@@ -24,7 +24,8 @@ import { signOut } from "firebase/auth"
 import { toast } from "@/hooks/use-toast"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
+import Image from "next/image"
+import { PlaceHolderImages } from "@/app/lib/placeholder-images"
 import { 
   ResponsiveContainer,
   Area,
@@ -36,19 +37,22 @@ import {
 } from "recharts"
 
 const MOCK_CHART_DATA = [
-  { day: '1', frequency: 4 }, { day: '10', frequency: 8 },
-  { day: '20', frequency: 12 }, { day: '30', frequency: 3 }
+  { day: '1', frequency: 4 }, { day: '5', frequency: 12 },
+  { day: '10', frequency: 8 }, { day: '15', frequency: 18 },
+  { day: '20', frequency: 12 }, { day: '25', frequency: 22 },
+  { day: '30', frequency: 6 }
 ];
 
 const VAULT_ITEMS = [
-  { id: 1, type: 'audio', name: 'Scam Call 09-04', date: 'Apr 9', size: '1.2MB' },
-  { id: 2, type: 'video', name: 'Deepfake Meeting', date: 'Apr 8', size: '14.5MB' },
-  { id: 3, type: 'audio', name: 'Voice Phishing', date: 'Apr 5', size: '0.8MB' },
+  { id: 1, type: 'audio', name: 'Voice Mimicry Detected', date: 'Oct 12', size: '1.2MB' },
+  { id: 2, type: 'video', name: 'Suspicious Zoom Feed', date: 'Oct 10', size: '24.8MB' },
+  { id: 3, type: 'audio', name: 'Bank Fraud Attempt', date: 'Oct 08', size: '0.9MB' },
 ];
 
 export function VishwaasHeader() {
   const auth = useAuth();
   const { user } = useUser();
+  const logo = PlaceHolderImages.find(img => img.id === 'vishwaas-logo');
   
   const [profileOpen, setProfileOpen] = useState(false);
   const [vaultOpen, setVaultOpen] = useState(false);
@@ -71,8 +75,18 @@ export function VishwaasHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/40 backdrop-blur-[20px]">
       <div className="container max-w-6xl mx-auto px-6 flex h-20 items-center justify-between">
         <div className="flex items-center gap-3 font-black text-white">
-          <div className="p-2 rounded-xl bg-white/5 border border-white/10 shadow-lg">
-            <Shield className="h-6 w-6 text-primary" />
+          <div className="relative h-12 w-20 overflow-hidden">
+            {logo?.imageUrl ? (
+              <Image 
+                src={logo.imageUrl} 
+                alt="Vishwaas Guard Logo" 
+                fill 
+                className="object-contain"
+                data-ai-hint="shield logo"
+              />
+            ) : (
+              <Shield className="h-8 w-8 text-primary" />
+            )}
           </div>
           <span className="text-xl tracking-tighter uppercase font-black">Vishwaas Guard</span>
         </div>
@@ -98,14 +112,13 @@ export function VishwaasHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-72 glass-panel p-2 mt-4 animate-in fade-in slide-in-from-top-4 duration-300" align="end">
-              {/* Decoration: Metallic Gold Ring */}
-              <div className="absolute -top-4 -left-4 h-12 w-12 metallic-ring opacity-40"></div>
+              <div className="absolute -top-4 -left-4 h-12 w-12 metallic-ring opacity-30"></div>
               
               <DropdownMenuLabel className="px-4 py-4 text-white">
                 <div className="space-y-1.5">
                   <p className="text-sm font-bold leading-none">{user?.displayName || "Security Member"}</p>
                   <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#DFFF00] animate-pulse"></div>
+                    <div className="glow-dot"></div>
                     <p className="active-protection-glow text-[10px] uppercase tracking-[0.2em]">
                       Active Protection
                     </p>
@@ -114,15 +127,15 @@ export function VishwaasHeader() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-white/10 mx-2" />
               <div className="p-1">
-                <DropdownMenuItem onClick={() => setProfileOpen(true)} className="rounded-xl px-4 py-3 cursor-pointer font-medium gap-3 text-white focus:bg-white/10 border-b border-white/5">
+                <DropdownMenuItem onClick={() => setProfileOpen(true)} className="rounded-xl px-4 py-3 cursor-pointer font-medium gap-3 text-white focus:bg-white/10 border-b border-white/5 transition-colors">
                   <Settings className="h-4 w-4 text-[#8E8E93]" />
                   Profile Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setVaultOpen(true)} className="rounded-xl px-4 py-3 cursor-pointer font-medium gap-3 text-white focus:bg-white/10 border-b border-white/5">
+                <DropdownMenuItem onClick={() => setVaultOpen(true)} className="rounded-xl px-4 py-3 cursor-pointer font-medium gap-3 text-white focus:bg-white/10 border-b border-white/5 transition-colors">
                   <Vault className="h-4 w-4 text-[#8E8E93]" />
                   Security Vault
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActivityOpen(true)} className="rounded-xl px-4 py-3 cursor-pointer font-medium gap-3 text-white focus:bg-white/10">
+                <DropdownMenuItem onClick={() => setActivityOpen(true)} className="rounded-xl px-4 py-3 cursor-pointer font-medium gap-3 text-white focus:bg-white/10 transition-colors">
                   <TrendingUp className="h-4 w-4 text-[#8E8E93]" />
                   Activity Analysis
                 </DropdownMenuItem>
@@ -139,7 +152,7 @@ export function VishwaasHeader() {
         </div>
       </div>
 
-      {/* --- Dialogs implemented with Frosted Glass --- */}
+      {/* Profile Modal */}
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
         <DialogContent className="glass-panel max-w-lg p-10 border-white/20 shadow-2xl overflow-hidden">
           <div className="absolute -bottom-20 -right-20 h-40 w-40 metallic-ring opacity-20 rotate-45"></div>
@@ -161,17 +174,17 @@ export function VishwaasHeader() {
               </div>
               <div className="flex items-center justify-between p-6 rounded-[24px] bg-white/5 border border-white/10">
                 <div className="space-y-1">
-                  <Label className="text-base font-bold text-white">Face ID Liveness</Label>
+                  <Label className="text-base font-bold text-white">Face ID Secondary Check</Label>
                   <p className="text-xs text-[#8E8E93]">Continuous volumetric geometric scan.</p>
                 </div>
                 <Switch checked={faceIdCheck} onCheckedChange={setFaceIdCheck} className="data-[state=checked]:bg-[#DFFF00]" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="h-14 rounded-[20px] bg-white/5 border-white/10 text-white font-bold gap-2">
+              <Button variant="outline" className="h-14 rounded-[20px] bg-white/5 border-white/10 text-white font-bold gap-2 hover:bg-white/10">
                 <Mic className="h-4 w-4" /> Retrain
               </Button>
-              <Button variant="outline" className="h-14 rounded-[20px] bg-white/5 border-white/10 text-white font-bold gap-2">
+              <Button variant="outline" className="h-14 rounded-[20px] bg-white/5 border-white/10 text-white font-bold gap-2 hover:bg-white/10">
                 <ScanFace className="h-4 w-4" /> Reset
               </Button>
             </div>
@@ -179,15 +192,16 @@ export function VishwaasHeader() {
         </DialogContent>
       </Dialog>
 
+      {/* Vault Modal */}
       <Dialog open={vaultOpen} onOpenChange={setVaultOpen}>
         <DialogContent className="glass-panel max-w-2xl p-10 border-white/20 shadow-2xl overflow-hidden">
           <div className="absolute top-10 left-10 h-64 w-64 sphere-blue opacity-10 pointer-events-none"></div>
           <DialogHeader className="space-y-2">
             <DialogTitle className="text-2xl font-black text-white flex items-center gap-3">
-              <Vault className="h-6 w-6 text-amber-500" />
+              <Vault className="h-6 w-6 text-primary" />
               Evidence Gallery
             </DialogTitle>
-            <DialogDescription className="text-[#8E8E93] font-medium">Encrypted storage for detected biometric threats.</DialogDescription>
+            <DialogDescription className="text-[#8E8E93] font-medium">Encrypted storage for detected deepfake threats.</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-3 gap-6 mt-8">
             {VAULT_ITEMS.map((item) => (
@@ -205,11 +219,12 @@ export function VishwaasHeader() {
         </DialogContent>
       </Dialog>
 
+      {/* Activity Modal */}
       <Dialog open={activityOpen} onOpenChange={setActivityOpen}>
         <DialogContent className="glass-panel max-w-4xl p-10 border-white/20 shadow-2xl overflow-hidden">
           <DialogHeader className="space-y-2">
             <DialogTitle className="text-2xl font-black text-white flex items-center gap-3">
-              <TrendingUp className="h-6 w-6 text-emerald-500" />
+              <TrendingUp className="h-6 w-6 text-primary" />
               Intelligence Analysis
             </DialogTitle>
             <DialogDescription className="text-[#8E8E93] font-medium">Deepfake Attempt Frequency over 30 days.</DialogDescription>
@@ -226,7 +241,15 @@ export function VishwaasHeader() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
                 <XAxis dataKey="day" stroke="#8E8E93" fontSize={10} axisLine={false} tickLine={false} />
                 <YAxis stroke="#8E8E93" fontSize={10} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: '#fff' }} />
+                <Tooltip 
+                  contentStyle={{ 
+                    background: 'rgba(0,0,0,0.8)', 
+                    border: '1px solid rgba(255,255,255,0.1)', 
+                    borderRadius: '16px', 
+                    color: '#fff',
+                    backdropFilter: 'blur(10px)'
+                  }} 
+                />
                 <Area type="monotone" dataKey="frequency" stroke="#0066FF" strokeWidth={4} fillOpacity={1} fill="url(#colorFreq)" />
               </AreaChart>
             </ResponsiveContainer>

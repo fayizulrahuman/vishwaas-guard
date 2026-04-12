@@ -1,0 +1,22 @@
+{
+  "placeholderImages": [
+    {
+      "id": "vishwaas-logo",
+      "description": "3D Glass Shield Brand Logo",
+      "imageUrl": "https://picsum.photos/seed/vishwaas-logo/600/400",
+      "imageHint": "shield logo"
+    },
+    {
+      "id": "hero-shield",
+      "description": "Abstract blue shield protection concept",
+      "imageUrl": "https://picsum.photos/seed/vishwaas-shield/1200/800",
+      "imageHint": "security protection"
+    },
+    {
+      "id": "scam-example",
+      "description": "Scam call visual representation",
+      "imageUrl": "https://picsum.photos/seed/scam/400/300",
+      "imageHint": "suspicious phone"
+    }
+  ]
+}
