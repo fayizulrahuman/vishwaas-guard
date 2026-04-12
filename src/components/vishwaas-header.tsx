@@ -14,12 +14,37 @@ export function VishwaasHeader() {
 
   const handleSignOut = () => {
     signOut(auth);
+    toast({
+      title: "Signed Out",
+      description: "You have been securely logged out of your session.",
+    })
   };
 
   const handleNotifications = () => {
     toast({
       title: "Security Notifications",
       description: "No new security alerts detected. Your perimeter is secure.",
+    })
+  }
+
+  const handleProfileSettings = () => {
+    toast({
+      title: "Profile Settings",
+      description: "Accessing your biometric identity and preference management.",
+    })
+  }
+
+  const handleSecurityVault = () => {
+    toast({
+      title: "Security Vault",
+      description: "Your encrypted keys and verification history are protected.",
+    })
+  }
+
+  const handleActivityAnalysis = () => {
+    toast({
+      title: "Activity Analysis",
+      description: "Reviewing recent liveness detection logs and communication patterns.",
     })
   }
 
@@ -64,15 +89,24 @@ export function VishwaasHeader() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-white/5 mx-2" />
               <div className="p-1">
-                <DropdownMenuItem className="rounded-xl px-4 py-2.5 cursor-pointer font-medium gap-3 focus:bg-primary/10 text-foreground">
+                <DropdownMenuItem 
+                  onClick={handleProfileSettings}
+                  className="rounded-xl px-4 py-2.5 cursor-pointer font-medium gap-3 focus:bg-primary/10 text-foreground"
+                >
                   <Settings className="h-4 w-4 text-muted-foreground" />
                   Profile Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-xl px-4 py-2.5 cursor-pointer font-medium gap-3 focus:bg-primary/10 text-foreground">
+                <DropdownMenuItem 
+                  onClick={handleSecurityVault}
+                  className="rounded-xl px-4 py-2.5 cursor-pointer font-medium gap-3 focus:bg-primary/10 text-foreground"
+                >
                   <Vault className="h-4 w-4 text-muted-foreground" />
                   Security Vault
                 </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-xl px-4 py-2.5 cursor-pointer font-medium gap-3 focus:bg-primary/10 text-foreground">
+                <DropdownMenuItem 
+                  onClick={handleActivityAnalysis}
+                  className="rounded-xl px-4 py-2.5 cursor-pointer font-medium gap-3 focus:bg-primary/10 text-foreground"
+                >
                   <Activity className="h-4 w-4 text-muted-foreground" />
                   Activity Analysis
                 </DropdownMenuItem>
