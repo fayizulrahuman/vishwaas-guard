@@ -29,35 +29,6 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const runSecurityAudit = async () => {
-    setIsAuditing(true);
-    try {
-      const result = await securityAudit({
-        recentAlerts: [
-          "Attempted voice mimicry detected 2 days ago.",
-          "Unusual geometric patterns detected in incoming video call.",
-          "System integrity check passed."
-        ],
-        systemUptime: "99.98%",
-        protectionStatus: "Active Shield",
-      });
-      setAuditResult(result);
-      toast({
-        title: "Audit Complete",
-        description: "Gemini has finished analyzing your security posture.",
-      });
-    } catch (error) {
-      console.error("Audit failed", error);
-      toast({
-        title: "Audit Failed",
-        description: "Could not reach the security intelligence server. Ensure your Gemini API Key is configured.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsAuditing(false);
-    }
-  };
-
   if (isUserLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
@@ -70,189 +41,182 @@ export default function Home() {
     return <AuthScreen />;
   }
 
-  const parallaxY = scrollY * 0.5; 
-  const opacity = Math.max(0, 1 - scrollY / 600);
+  const parallaxY = scrollY * 0.3; 
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20">
-      <VishwaasHeader />
-      <IncomingThreatInterceptor />
-      
-      <main className="flex-1 container max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-12 md:space-y-16">
-        {/* Hero Section */}
-        <section 
-          className="space-y-6 md:space-y-8 will-change-transform transition-opacity duration-150"
-          style={{ 
-            transform: `translateY(${-parallaxY}px)`,
-            opacity: opacity
-          }}
-        >
-          <div className="space-y-2 max-w-3xl">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-[1.1]">
-              Privacy. Secured.
-            </h1>
-            <p className="text-muted-foreground text-lg md:text-xl font-medium leading-relaxed">
-              Real-time liveness detection and deepfake analysis activated for your communication channels.
-            </p>
-          </div>
-          
-          <div className="rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border border-white/10 bg-black shadow-2xl ring-1 ring-white/5">
-            <ShieldOverlay />
-          </div>
-        </section>
+    <div className="min-h-screen relative bg-black selection:bg-primary/20 overflow-hidden">
+      {/* --- Background Glassmorphism Spheres --- */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="bg-sphere sphere-blue -top-40 -left-40 animate-float" style={{ animationDelay: '0s' }}></div>
+        <div className="bg-sphere sphere-blue top-1/4 -right-20 animate-float" style={{ animationDelay: '-3s' }}></div>
+        <div className="bg-sphere sphere-orange -bottom-60 left-1/2 -translate-x-1/2 opacity-30 animate-float" style={{ animationDelay: '-5s' }}></div>
+      </div>
 
-        {/* Dashboard Content */}
-        <div className="relative z-10 bg-background/95 backdrop-blur-md -mt-16 md:-mt-24 pt-16 md:pt-24 rounded-t-[2.5rem] md:rounded-t-[3.5rem]">
-          {/* Stats Grid */}
-          <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16">
-            {[
-              { label: "Prevented", value: "1,248", icon: Shield, color: "text-primary" },
-              { label: "Community", value: "5.4k+", icon: Users, color: "text-primary" },
-              { label: "Uptime", value: "99.9%", icon: CheckCircle, color: "text-emerald-500" },
-              { label: "Threat", value: "Low", icon: ShieldAlert, color: "text-blue-500" },
-            ].map((stat, i) => (
-              <Card key={i} className="border-border bg-card shadow-sm rounded-2xl md:rounded-3xl transition-all hover:shadow-lg hover:scale-[1.02] duration-300">
-                <CardContent className="p-4 md:p-6">
-                  <div className="flex flex-col gap-3">
-                    <div className={`p-2 rounded-xl bg-white/5 ${stat.color} w-fit`}>
-                      <stat.icon className="h-4 w-4" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
-                      <p className="text-lg md:text-2xl font-black text-foreground">{stat.value}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      <div className="relative z-10">
+        <VishwaasHeader />
+        <IncomingThreatInterceptor />
+        
+        <main className="container max-w-6xl mx-auto px-6 py-12 space-y-24">
+          {/* Hero Section */}
+          <section 
+            className="space-y-12 transition-all duration-300"
+            style={{ transform: `translateY(${-parallaxY}px)` }}
+          >
+            <div className="space-y-4 max-w-3xl">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-[1.05]">
+                Privacy.<br />Secured by Glass.
+              </h1>
+              <p className="text-[#8E8E93] text-xl md:text-2xl font-medium leading-relaxed max-w-2xl">
+                Real-time liveness detection and deepfake analysis flowing through a high-fidelity security filter.
+              </p>
+            </div>
+            
+            <div className="glass-panel overflow-hidden border-white/20 shadow-2xl">
+              <ShieldOverlay />
+            </div>
           </section>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
-            <div className="lg:col-span-8 space-y-12 md:space-y-16">
-              <ScamSignatures />
-              
-              {auditResult && (
-                <Card id="audit-result" className="border-border bg-white/5 backdrop-blur-md rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
-                  <CardHeader className="p-8 md:p-10 pb-4">
-                    <div className="flex items-center gap-2 text-primary mb-3">
-                      <Sparkles className="h-5 w-5" />
-                      <span className="text-[10px] font-black uppercase tracking-widest">AI Audit Result</span>
+          {/* Dashboard Content */}
+          <div className="space-y-24">
+            {/* Stats Grid */}
+            <section className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { label: "Prevented", value: "1,248", icon: Shield, color: "text-primary" },
+                { label: "Community", value: "5.4k+", icon: Users, color: "text-primary" },
+                { label: "Uptime", value: "99.9%", icon: CheckCircle, color: "text-emerald-500" },
+                { label: "Threat", value: "Low", icon: ShieldAlert, color: "text-blue-500" },
+              ].map((stat, i) => (
+                <div key={i} className="glass-panel p-6 hover:bg-white/10 transition-all duration-500 hover:scale-[1.02]">
+                  <div className="flex flex-col gap-4">
+                    <div className={`p-2.5 rounded-xl bg-white/5 ${stat.color} w-fit`}>
+                      <stat.icon className="h-5 w-5" />
                     </div>
-                    <CardTitle className="text-2xl md:text-3xl font-black">Your Security Score: {auditResult.securityScore}%</CardTitle>
-                    <CardDescription className="text-base md:text-lg text-muted-foreground font-medium leading-relaxed mt-2">
-                      {auditResult.auditSummary}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-8 p-8 md:p-10 pt-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-[#8E8E93] uppercase tracking-[0.2em]">{stat.label}</p>
+                      <p className="text-2xl font-black text-white">{stat.value}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </section>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+              <div className="lg:col-span-8 space-y-16">
+                <ScamSignatures />
+                
+                {auditResult && (
+                  <div className="glass-panel p-10 space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 text-primary">
+                        <Sparkles className="h-5 w-5" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">AI Audit Report</span>
+                      </div>
+                      <h2 className="text-3xl font-black text-white">Security Integrity: {auditResult.securityScore}%</h2>
+                      <p className="text-lg text-[#8E8E93] font-medium leading-relaxed">
+                        {auditResult.auditSummary}
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                       {auditResult.recommendations.map((rec, i) => (
-                        <div key={i} className="bg-white/5 p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-white/5 shadow-sm flex flex-col gap-3">
-                          <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-black text-xs md:text-sm">
+                        <div key={i} className="bg-white/5 p-6 rounded-[24px] border border-white/10 flex flex-col gap-4">
+                          <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-black text-xs">
                             {i + 1}
                           </div>
-                          <p className="text-xs md:text-sm font-semibold text-foreground leading-tight">{rec}</p>
+                          <p className="text-sm font-semibold text-white leading-snug">{rec}</p>
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-            
-            <div className="lg:col-span-4 space-y-8 md:space-y-12">
-              <Card className="bg-primary text-primary-foreground border-none rounded-[2rem] overflow-hidden relative shadow-2xl shadow-primary/20">
-                <CardHeader className="p-8 md:p-10 pb-0">
-                  <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-bold">
-                    <BarChart3 className="h-5 w-5" />
+                  </div>
+                )}
+              </div>
+              
+              <div className="lg:col-span-4 space-y-12">
+                <div className="glass-panel p-10 space-y-8 bg-primary/10 border-primary/20">
+                  <h3 className="flex items-center gap-2 text-xl font-black text-white">
+                    <BarChart3 className="h-5 w-5 text-primary" />
                     Security Health
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6 p-8 md:p-10">
-                  <div className="flex justify-center py-4">
-                    <div className="relative h-28 w-28 md:h-32 md:w-32 flex items-center justify-center rounded-full border-[8px] border-white/10">
-                       <div className="absolute inset-0 rounded-full border-[8px] border-white border-t-transparent animate-spin-slow"></div>
-                       <span className="text-2xl md:text-3xl font-black">{auditResult ? auditResult.securityScore : '94'}%</span>
+                  </h3>
+                  
+                  <div className="flex justify-center">
+                    <div className="relative h-40 w-40 flex items-center justify-center rounded-full border-[8px] border-white/5">
+                       <div className="absolute inset-0 rounded-full border-[8px] border-primary border-t-transparent animate-spin-slow"></div>
+                       <span className="text-4xl font-black text-white">{auditResult ? auditResult.securityScore : '94'}%</span>
                     </div>
                   </div>
+
                   <Button 
-                    onClick={runSecurityAudit}
+                    onClick={async () => {
+                      setIsAuditing(true);
+                      try {
+                        const result = await securityAudit({
+                          recentAlerts: ["Attempted voice mimicry detected.", "System integrity check passed."],
+                          systemUptime: "99.98%",
+                          protectionStatus: "Active Shield",
+                        });
+                        setAuditResult(result);
+                      } finally {
+                        setIsAuditing(false);
+                      }
+                    }}
                     disabled={isAuditing}
-                    className="w-full h-12 rounded-2xl bg-white text-primary hover:bg-white/90 font-black shadow-lg shadow-black/20 flex items-center justify-center gap-2 group transition-all"
+                    className="w-full h-14 rounded-[20px] bg-white text-black hover:bg-white/90 font-black shadow-xl gap-2 transition-all"
                   >
-                    {isAuditing ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <>
-                        <Sparkles className="h-5 w-5" />
-                        Run AI Audit
-                        <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-                      </>
-                    )}
+                    {isAuditing ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Sparkles className="h-5 w-5" /> Run AI Audit</>}
                   </Button>
-                  <p className="text-[10px] text-primary-foreground/60 text-center font-bold uppercase tracking-widest flex items-center justify-center gap-1">
-                    Powered by Gemini AI
+                  
+                  <p className="text-[10px] text-[#8E8E93] text-center font-black uppercase tracking-[0.2em]">
+                    Powered by Gemini Intelligence
                   </p>
-                </CardContent>
-              </Card>
+                </div>
 
-              <ReportVulnerability />
+                <ReportVulnerability />
+              </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
 
-      <footer className="border-t border-white/5 bg-black pt-16 pb-12 mt-24">
-        <div className="container max-w-6xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
-          <div className="space-y-6">
-            <div className="flex items-center gap-2 font-black text-foreground">
-              <Shield className="h-6 w-6 text-primary" />
-              <span className="text-lg tracking-tight uppercase">Vishwaas Guard</span>
+        <footer className="border-t border-white/10 bg-black/40 backdrop-blur-3xl pt-24 pb-12 mt-48">
+          <div className="container max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 font-black text-white">
+                <Shield className="h-7 w-7 text-primary" />
+                <span className="text-xl tracking-tighter uppercase">Vishwaas Guard</span>
+              </div>
+              <p className="text-sm text-[#8E8E93] leading-relaxed font-medium">
+                The global standard for deepfake resilience and biometric communication integrity.
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed font-medium">
-              Advancing human communication through trust and deepfake resilience using cutting-edge biometric protection.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-bold text-xs uppercase tracking-widest mb-6 text-foreground">Technology</h4>
-            <ul className="text-sm space-y-3 text-muted-foreground font-medium">
-              <li>Gemini 1.5 Analysis</li>
-              <li>Face Liveness ML</li>
-              <li>Voice Biometrics</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold text-xs uppercase tracking-widest mb-6 text-foreground">API Resources</h4>
-            <ul className="text-sm space-y-3 text-muted-foreground font-medium">
-              <li className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer">
-                Google AI Studio <ExternalLink className="h-3 w-3" />
-              </li>
-              <li className="hover:text-primary transition-colors cursor-pointer">Security Whitepaper</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold text-xs uppercase tracking-widest mb-6 text-foreground">Company</h4>
-            <div className="flex flex-col items-start gap-1">
-              <Button 
-                variant="link" 
-                className="h-auto p-0 text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
-                onClick={() => toast({ title: "Privacy Policy", description: "Your biometric data never leaves your device." })}
-              >
-                Privacy Policy
-              </Button>
-              <Button 
-                variant="link" 
-                className="h-auto p-0 text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
-                onClick={() => toast({ title: "Terms of Service", description: "Vishwaas Guard is for personal communication protection only." })}
-              >
-                Terms of Service
-              </Button>
+            <div>
+              <h4 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-white">Technology</h4>
+              <ul className="text-sm space-y-4 text-[#8E8E93] font-medium">
+                <li>Gemini 1.5 Pro</li>
+                <li>Biometric Liveness</li>
+                <li>Voice Fingerprinting</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-white">Resources</h4>
+              <ul className="text-sm space-y-4 text-[#8E8E93] font-medium">
+                <li className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer">
+                  Security Hub <ExternalLink className="h-3 w-3" />
+                </li>
+                <li className="hover:text-white transition-colors cursor-pointer">API Documentation</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-black text-[10px] uppercase tracking-[0.2em] mb-8 text-white">Legal</h4>
+              <div className="flex flex-col items-start gap-2">
+                <Button variant="link" className="p-0 h-auto text-[#8E8E93] hover:text-white font-medium">Privacy Policy</Button>
+                <Button variant="link" className="p-0 h-auto text-[#8E8E93] hover:text-white font-medium">Terms of Use</Button>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="container max-w-6xl mx-auto mt-16 pt-8 border-t border-white/5 text-center text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">
-          © {new Date().getFullYear()} Vishwaas Guard. Secure Communication Integrity.
-        </div>
-      </footer>
+          <div className="container max-w-6xl mx-auto mt-24 pt-12 border-t border-white/5 text-center text-[10px] text-[#8E8E93] uppercase tracking-[0.3em] font-black">
+            © {new Date().getFullYear()} Vishwaas Guard. Cyber-Physical Integrity.
+          </div>
+        </footer>
+      </div>
     </div>
   )
 }

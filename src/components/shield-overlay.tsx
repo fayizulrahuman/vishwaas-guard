@@ -1,15 +1,13 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from 'react'
-import { Shield, ShieldAlert, ShieldCheck, Eye, EyeOff, Camera, Mic, PhoneOff, AlertTriangle } from 'lucide-react'
+import { Shield, ShieldAlert, ShieldCheck, Eye, EyeOff, Camera, Mic, PhoneOff, AlertTriangle, Fingerprint } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { realtimeDeepfakeAlertTriggering } from '@/ai/flows/realtime-deepfake-alert-triggering'
 import { toast } from '@/hooks/use-toast'
 
-// Robust minimal Base64 headers for testing
 const MOCK_AUDIO_B64 = "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YRAAAAAAAAAAAAAAAAAAAAAAAAAA"
 const MOCK_VIDEO_B64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
 
@@ -17,7 +15,6 @@ export function ShieldOverlay() {
   const [isActive, setIsActive] = useState(false)
   const [privacyConsent, setPrivacyConsent] = useState(false)
   const [probability, setProbability] = useState(0)
-  const [isScanning, setIsScanning] = useState(false)
   const [status, setStatus] = useState<'idle' | 'secure' | 'warning' | 'critical'>('idle')
   const [analysisText, setAnalysisText] = useState('Standby for biometric scan...')
   const [isCameraOff, setIsCameraOff] = useState(false)
@@ -26,90 +23,42 @@ export function ShieldOverlay() {
 
   const toggleShield = () => {
     if (!privacyConsent) {
-      toast({
-        title: "Consent Required",
-        description: "Please confirm privacy consent before activating the shield.",
-        variant: "destructive"
-      })
-      return
+      toast({ title: "Consent Required", description: "Grant biometric access first.", variant: "destructive" });
+      return;
     }
     
     setIsActive(!isActive)
     if (!isActive) {
       startScanning()
-      toast({
-        title: "Guard Activated",
-        description: "Monitoring communication for deepfake signatures.",
-      })
+      toast({ title: "Shield Activated", description: "Live liveness filter is now active." });
     } else {
       stopScanning()
-      toast({
-        title: "Guard Deactivated",
-        description: "Scanning has been paused.",
-      })
     }
   }
 
   const startScanning = () => {
-    setIsScanning(true)
     setStatus('secure')
-    setAnalysisText('Analyzing voice biometric markers...')
-    
     scanInterval.current = setInterval(async () => {
       try {
         const result = await realtimeDeepfakeAlertTriggering({
           audioSegmentDataUri: MOCK_AUDIO_B64,
           videoFrameDataUri: MOCK_VIDEO_B64,
-          contextualInfo: "User is in a high-risk financial video call."
         })
-        
         const newProb = result.deepfakeProbability
         setProbability(newProb * 100)
         setAnalysisText(result.explanation)
-        
-        if (newProb > 0.8) {
-          setStatus('critical')
-          toast({
-            title: "CRITICAL ALERT",
-            description: "High deepfake probability detected! End call immediately.",
-            variant: "destructive"
-          })
-        } else if (newProb > 0.4) {
-          setStatus('warning')
-        } else {
-          setStatus('secure')
-        }
-      } catch (e) {
-        // Errors are handled by the global listener but we log for local awareness
-        console.warn("Analysis cycle skip due to network or logic error.")
-      }
+        if (newProb > 0.8) setStatus('critical');
+        else if (newProb > 0.4) setStatus('warning');
+        else setStatus('secure');
+      } catch (e) {}
     }, 5000)
   }
 
   const stopScanning = () => {
     if (scanInterval.current) clearInterval(scanInterval.current)
-    setIsScanning(false)
     setStatus('idle')
     setProbability(0)
     setAnalysisText('Standby for biometric scan...')
-  }
-
-  const handleEndCall = () => {
-    toast({
-      title: "Call Terminated",
-      description: "Connection closed safely by Vishwaas Guard.",
-      variant: "destructive"
-    })
-    stopScanning()
-    setIsActive(false)
-  }
-
-  const toggleCamera = () => {
-    setIsCameraOff(!isCameraOff)
-    toast({
-      title: isCameraOff ? "Camera On" : "Privacy Mode Active",
-      description: isCameraOff ? "Video feed restored." : "Video feed masked for privacy.",
-    })
   }
 
   useEffect(() => {
@@ -117,22 +66,24 @@ export function ShieldOverlay() {
   }, [])
 
   return (
-    <div className="relative w-full overflow-hidden rounded-[1.5rem] md:rounded-[2.2rem] bg-slate-950 aspect-[16/10] md:aspect-video shadow-2xl group/shield">
+    <div className="relative w-full overflow-hidden rounded-[20px] bg-black aspect-video group/shield">
       {!privacyConsent && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-6 text-center">
-          <div className="max-w-sm space-y-6 animate-in fade-in zoom-in-95 duration-500">
-            <div className="bg-primary/20 p-4 rounded-3xl w-fit mx-auto">
-              <Shield className="h-12 w-12 text-primary" />
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-3xl p-12 text-center">
+          <div className="max-w-md space-y-8 animate-in fade-in zoom-in-95 duration-700">
+            <div className="relative h-24 w-24 mx-auto">
+              <div className="absolute inset-0 metallic-ring animate-spin-slow"></div>
+              <div className="absolute inset-1 glass-panel rounded-full flex items-center justify-center">
+                <Fingerprint className="h-10 w-10 text-primary" />
+              </div>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-2xl font-black text-white tracking-tight">Biometric Consent</h3>
-              <p className="text-slate-400 text-sm font-medium leading-relaxed">
-                To detect deepfakes, Vishwaas Guard analyzes camera and audio markers in real-time. 
-                Data is processed locally and never stored.
+            <div className="space-y-4">
+              <h3 className="text-3xl font-black text-white tracking-tighter">Biometric Entry</h3>
+              <p className="text-[#8E8E93] text-lg font-medium leading-relaxed">
+                Unlock the security layer by granting real-time biometric access. Data remains strictly on-device.
               </p>
             </div>
-            <Button onClick={() => setPrivacyConsent(true)} className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 font-bold shadow-lg shadow-primary/20">
-              Grant Secure Access
+            <Button onClick={() => setPrivacyConsent(true)} className="w-full h-14 rounded-[20px] bg-white text-black font-black text-lg">
+              Unlock Glass Filter
             </Button>
           </div>
         </div>
@@ -140,82 +91,67 @@ export function ShieldOverlay() {
 
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
         {isCameraOff ? (
-          <div className="w-full h-full bg-slate-900 flex flex-col items-center justify-center gap-4 text-slate-700">
-             <Camera className="h-16 w-16 opacity-10" />
-             <p className="text-[10px] font-black tracking-[0.3em] uppercase">Private Feed</p>
+          <div className="w-full h-full bg-zinc-950 flex flex-col items-center justify-center gap-4 text-zinc-800">
+             <Camera className="h-20 w-20 opacity-10" />
+             <p className="text-[10px] font-black tracking-[0.5em] uppercase">Private Stream</p>
           </div>
         ) : (
           <>
             <img 
-              src="https://picsum.photos/seed/vishwaas-call/1280/720" 
+              src="https://picsum.photos/seed/vishwaas-call/1920/1080" 
               alt="Call Feed" 
-              className="object-cover w-full h-full opacity-40 grayscale-[0.2] transition-opacity duration-700"
-              data-ai-hint="video call"
+              className="object-cover w-full h-full opacity-40 grayscale-[0.2]"
             />
-            {isActive && (
-              <div className="absolute inset-0 pointer-events-none">
-                <div className="scanline"></div>
-                <div className="absolute inset-0 border-[20px] border-primary/5"></div>
-              </div>
-            )}
+            {isActive && <div className="scanline"></div>}
           </>
         )}
       </div>
 
-      <div className="absolute inset-0 p-6 md:p-10 flex flex-col justify-between pointer-events-none">
+      <div className="absolute inset-0 p-10 flex flex-col justify-between pointer-events-none">
         <div className="flex justify-between items-start">
-          <div className="flex flex-col gap-2">
-            <Badge variant={isActive ? "default" : "secondary"} className={`flex gap-1.5 items-center px-3 py-1 text-[10px] font-black uppercase tracking-widest ${isActive ? 'bg-primary text-white border-none shadow-lg shadow-primary/20' : 'bg-black/40 text-white/60 border-white/10 backdrop-blur-md'}`}>
-              {isActive ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-              {isActive ? "Shield Active" : "Shield Standby"}
-            </Badge>
-            {isActive && !isCameraOff && (
-              <Badge variant="outline" className="bg-black/20 text-white/80 border-white/10 text-[9px] font-bold tracking-widest uppercase animate-pulse w-fit">
-                Liveness Scan: ON
-              </Badge>
-            )}
-          </div>
+          <Badge variant={isActive ? "default" : "outline"} className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] ${isActive ? 'bg-primary text-white border-none' : 'bg-black/40 text-white/60 border-white/10 backdrop-blur-md'}`}>
+            {isActive ? <Eye className="h-3 w-3 mr-2" /> : <EyeOff className="h-3 w-3 mr-2" />}
+            {isActive ? "Filter On" : "Filter Ready"}
+          </Badge>
           
-          <div className="flex items-center gap-3 bg-black/40 p-2.5 rounded-2xl border border-white/10 backdrop-blur-md">
-            <div className="flex gap-1 h-4 items-center">
-               {[1,2,3,4,5,6].map(i => (
-                 <div key={i} className={`w-1 rounded-full bg-primary transition-all duration-300 ${isActive ? 'animate-pulse' : 'h-1.5 opacity-20'}`} style={{ height: isActive ? `${40 + Math.random() * 60}%` : '6px', opacity: 0.5 + (i * 0.1) }}></div>
+          <div className="bg-black/40 px-4 py-2 rounded-2xl border border-white/10 backdrop-blur-md flex items-center gap-3">
+            <div className="flex gap-1 h-3 items-center">
+               {[1,2,3,4,5].map(i => (
+                 <div key={i} className={`w-1 rounded-full bg-primary transition-all duration-300 ${isActive ? 'animate-pulse' : 'h-1 opacity-20'}`} style={{ height: isActive ? `${50 + Math.random() * 50}%` : '4px' }}></div>
                ))}
             </div>
-            <Mic className={`h-4 w-4 ${isActive ? 'text-primary' : 'text-slate-600'}`} />
+            <Mic className={`h-4 w-4 ${isActive ? 'text-primary' : 'text-zinc-600'}`} />
           </div>
         </div>
 
         {isActive ? (
-          <div className="flex flex-col md:flex-row justify-between items-end gap-6 animate-in slide-in-from-bottom-4 duration-500">
-            <Card className="p-5 md:p-6 bg-black/60 border-white/20 backdrop-blur-xl text-white max-w-sm pointer-events-auto rounded-3xl shadow-2xl">
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`p-2 rounded-xl ${status === 'critical' ? 'bg-destructive/20 text-destructive' : 'bg-primary/20 text-primary'}`}>
-                  {status === 'secure' && <ShieldCheck className="h-5 w-5" />}
-                  {status === 'warning' && <AlertTriangle className="h-5 w-5" />}
-                  {status === 'critical' && <ShieldAlert className="h-5 w-5" />}
+          <div className="flex flex-col md:flex-row justify-between items-end gap-8 animate-in slide-in-from-bottom-8 duration-700">
+            <div className="glass-panel p-8 max-w-sm pointer-events-auto">
+              <div className="flex items-center gap-4 mb-4">
+                <div className={`p-3 rounded-xl ${status === 'critical' ? 'bg-destructive/20 text-destructive' : 'bg-primary/20 text-primary'}`}>
+                  {status === 'secure' ? <ShieldCheck className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6" />}
                 </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-white/60">Risk Assessment</p>
-                  <span className="font-bold text-lg md:text-xl">
-                    {probability.toFixed(0)}% Probability
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8E8E93]">Risk Integrity</p>
+                  <span className="font-black text-2xl text-white">
+                    {probability.toFixed(0)}% Accurate
                   </span>
                 </div>
               </div>
-              <Progress value={probability} className="h-1.5 mb-4 bg-white/10 overflow-hidden rounded-full">
-                <div className={`h-full transition-all duration-500 ${status === 'critical' ? 'bg-destructive' : 'bg-primary'}`} style={{ width: `${probability}%` }}></div>
+              <Progress value={probability} className="h-1.5 mb-4 bg-white/5 rounded-full overflow-hidden">
+                <div className={`h-full transition-all duration-1000 ${status === 'critical' ? 'bg-destructive' : 'bg-primary'}`} style={{ width: `${probability}%` }}></div>
               </Progress>
-              <p className="text-xs text-slate-300 leading-relaxed font-medium">
+              <p className="text-xs text-[#8E8E93] leading-relaxed font-bold italic">
                 {analysisText}
               </p>
-            </Card>
+            </div>
 
-            <div className="flex gap-3 pointer-events-auto">
-               <Button onClick={handleEndCall} size="icon" variant="destructive" className="h-14 w-14 rounded-full shadow-2xl hover:scale-110 transition-transform bg-destructive hover:bg-destructive/90">
-                 <PhoneOff className="h-6 w-6" />
+            <div className="flex gap-4 pointer-events-auto">
+               <Button onClick={() => { setIsActive(false); stopScanning(); }} size="icon" variant="destructive" className="h-16 w-16 rounded-full shadow-2xl bg-destructive hover:bg-destructive/90 transition-transform hover:scale-110">
+                 <PhoneOff className="h-7 w-7" />
                </Button>
-               <Button onClick={toggleCamera} size="icon" variant="secondary" className={`h-14 w-14 rounded-full backdrop-blur-xl border-none ${isCameraOff ? 'bg-white text-slate-900' : 'bg-white/10 text-white'} hover:bg-white/20 transition-all`}>
-                 <Camera className="h-6 w-6" />
+               <Button onClick={() => setIsCameraOff(!isCameraOff)} size="icon" variant="outline" className={`h-16 w-16 rounded-full glass-panel border-none ${isCameraOff ? 'bg-white text-black' : 'text-white'} transition-all`}>
+                 <Camera className="h-7 w-7" />
                </Button>
             </div>
           </div>
@@ -223,9 +159,9 @@ export function ShieldOverlay() {
           <div className="flex flex-col items-center justify-center flex-1">
              <Button 
               onClick={toggleShield}
-              className="group/btn relative h-28 w-28 md:h-32 md:w-32 rounded-full bg-primary/10 hover:bg-primary/20 backdrop-blur-2xl border-4 border-primary/40 text-primary font-black text-xs md:text-sm flex flex-col items-center justify-center gap-2 shadow-[0_0_50px_rgba(0,102,204,0.3)] transition-all hover:scale-105 pointer-events-auto"
+              className="relative h-32 w-32 rounded-full glass-panel border-white/20 text-white font-black text-xs flex flex-col items-center justify-center gap-3 shadow-[0_0_80px_rgba(0,102,204,0.4)] transition-all hover:scale-110 pointer-events-auto border-2 group/activate"
             >
-              <Shield className="h-10 w-10 md:h-12 md:w-12 transition-transform group-hover/btn:scale-110" />
+              <Shield className="h-12 w-12 transition-transform group-hover/activate:scale-110 text-primary" />
               ACTIVATE
             </Button>
           </div>

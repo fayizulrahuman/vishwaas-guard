@@ -6,9 +6,9 @@
   :root {
     --background: 0 0% 0%; /* Absolute Black #000000 */
     --foreground: 210 20% 98%; /* Apple Off-white #F5F5F7 */
-    --card: 220 5% 8%; /* Dark Charcoal */
+    --card: 0 0% 0%;
     --card-foreground: 210 20% 98%;
-    --popover: 220 5% 10%;
+    --popover: 0 0% 0%;
     --popover-foreground: 210 20% 98%;
     --primary: 210 100% 50%; /* Vibrant Apple Blue */
     --primary-foreground: 0 0% 100%;
@@ -20,8 +20,8 @@
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 10% 18%;
-    --input: 220 10% 18%;
+    --border: 0 0% 100% / 0.1;
+    --input: 0 0% 100% / 0.1;
     --ring: 210 100% 50%;
     --radius: 1.25rem;
   }
@@ -32,59 +32,66 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body selection:bg-primary/20;
+    @apply bg-background text-foreground font-body selection:bg-primary/20 overflow-x-hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-headline font-bold tracking-tight;
-    letter-spacing: -0.02em;
-  }
 }
 
-.glass-card {
-  @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)];
+/* --- Glassmorphism Core --- */
+.frosted-glass {
+  @apply bg-white/5 backdrop-blur-[15px] border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)];
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
-.apple-button {
-  @apply h-11 px-6 rounded-full font-medium transition-all active:scale-[0.98] flex items-center justify-center gap-2;
+.glass-panel {
+  @apply frosted-glass rounded-[20px];
 }
 
-.scanline {
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(to right, transparent, hsl(var(--primary)), transparent);
-  position: absolute;
-  top: 0;
-  left: 0;
-  animation: scan 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  z-index: 10;
+/* --- Background Spheres --- */
+.bg-sphere {
+  @apply absolute rounded-full blur-[120px] opacity-40 mix-blend-screen pointer-events-none;
 }
 
-@keyframes scan {
-  0% { top: 0; opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
+.sphere-blue {
+  background: radial-gradient(circle, #0066FF 0%, transparent 70%);
+  width: 600px;
+  height: 600px;
 }
 
-@keyframes pulse-green {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+.sphere-orange {
+  background: radial-gradient(circle, #FF4D00 0%, transparent 70%);
+  width: 800px;
+  height: 800px;
 }
 
-.animate-pulse-green {
-  animation: pulse-green 2s infinite;
+/* --- Animations --- */
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
 }
 
-.animate-spin-slow {
-  animation: spin 8s linear infinite;
+.animate-float {
+  animation: float 10s ease-in-out infinite;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.active-protection-glow {
+  @apply text-[#DFFF00] font-black tracking-widest; /* Lime Green/Yellow */
+  text-shadow: 0 0 10px rgba(223, 255, 0, 0.5);
+}
+
+.metallic-ring {
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    #D4AF37 0deg,
+    #FFD700 90deg,
+    #B8860B 180deg,
+    #FFD700 270deg,
+    #D4AF37 360deg
+  );
+  @apply rounded-full p-[2px];
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -96,7 +103,4 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
 }
