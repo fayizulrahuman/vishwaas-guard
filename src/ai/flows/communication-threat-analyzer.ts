@@ -34,6 +34,7 @@ const threatPrompt = ai.definePrompt({
   name: 'analyzeCommunicationThreatPrompt',
   input: {schema: AnalyzeThreatInputSchema},
   output: {schema: AnalyzeThreatOutputSchema},
+  model: 'googleai/gemini-1.5-flash',
   prompt: `You are the Vishwaas Guard Security Intelligence Engine. Your goal is to analyze communication content to detect scams, deepfakes, and social engineering attempts.
 
 Analyze the following:

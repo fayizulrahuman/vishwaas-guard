@@ -41,11 +41,11 @@ export async function deepfakeProbabilityAnalysis(
   return deepfakeProbabilityAnalysisFlow(input);
 }
 
-const deepfakeProbabilityPrompt = ai.definePrompt({
-  name: 'deepfakeProbabilityPrompt',
+const deepfakeProbabilityAnalysisPrompt = ai.definePrompt({
+  name: 'deepfakeProbabilityAnalysisPrompt',
   input: {schema: DeepfakeProbabilityAnalysisInputSchema},
   output: {schema: DeepfakeProbabilityAnalysisOutputSchema},
-  model: 'gemini-1.5-flash',
+  model: 'googleai/gemini-1.5-flash',
   prompt: `You are an expert deepfake detection system. Your task is to analyze the provided audio and video metadata along with the call context to determine the probability of a deepfake.
 
 Analyze the following inputs:
@@ -64,7 +64,7 @@ const deepfakeProbabilityAnalysisFlow = ai.defineFlow(
     outputSchema: DeepfakeProbabilityAnalysisOutputSchema,
   },
   async input => {
-    const {output} = await deepfakeProbabilityPrompt(input);
+    const {output} = await deepfakeProbabilityAnalysisPrompt(input);
     if (!output) {
       throw new Error('Failed to get deepfake probability analysis from the model.');
     }

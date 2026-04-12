@@ -9,7 +9,7 @@ import { ScamSignatures } from "@/components/scam-signatures"
 import { ReportVulnerability } from "@/components/report-vulnerability"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Shield, ShieldAlert, Users, CheckCircle, BarChart3, Loader2, Sparkles, ArrowRight } from "lucide-react"
+import { Shield, ShieldAlert, Users, CheckCircle, BarChart3, Loader2, Sparkles, ArrowRight, ExternalLink } from "lucide-react"
 import { securityAudit, SecurityAuditOutput } from "@/ai/flows/security-audit-flow"
 import { toast } from "@/hooks/use-toast"
 
@@ -49,7 +49,7 @@ export default function Home() {
       console.error("Audit failed", error);
       toast({
         title: "Audit Failed",
-        description: "Could not connect to the security intelligence server.",
+        description: "Could not reach the security intelligence server. Ensure your Gemini API Key is configured.",
         variant: "destructive",
       });
     } finally {
@@ -69,17 +69,17 @@ export default function Home() {
     return <AuthScreen />;
   }
 
-  const parallaxY = scrollY * 0.4;
-  const opacity = Math.max(0, 1 - scrollY / 500);
+  const parallaxY = scrollY * 0.5; // Optimized speed for the sinking effect
+  const opacity = Math.max(0, 1 - scrollY / 600);
 
   return (
     <div className="min-h-screen flex flex-col bg-background selection:bg-primary/10">
       <VishwaasHeader />
       
-      <main className="flex-1 container max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-12 md:space-y-20">
-        {/* Hero Section - Compact for Visibility */}
+      <main className="flex-1 container max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-12 md:space-y-16">
+        {/* Hero Section - Optimized for visibility */}
         <section 
-          className="space-y-6 md:space-y-8 will-change-transform transition-opacity duration-75"
+          className="space-y-6 md:space-y-8 will-change-transform transition-opacity duration-150"
           style={{ 
             transform: `translateY(${-parallaxY}px)`,
             opacity: opacity
@@ -100,24 +100,24 @@ export default function Home() {
         </section>
 
         {/* Dashboard Content */}
-        <div className="relative z-10 bg-background/95 backdrop-blur-md -mt-10 md:-mt-16 pt-10 md:pt-16 rounded-t-[2.5rem] md:rounded-t-[3.5rem]">
-          {/* Stats Grid - Optimized for all screens */}
+        <div className="relative z-10 bg-background/95 backdrop-blur-md -mt-16 md:-mt-24 pt-16 md:pt-24 rounded-t-[2.5rem] md:rounded-t-[3.5rem]">
+          {/* Stats Grid - High visibility metrics */}
           <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16">
             {[
-              { label: "Deepfakes Prevented", value: "1,248", icon: Shield, color: "text-primary" },
-              { label: "Community Reports", value: "5.4k+", icon: Users, color: "text-primary" },
-              { label: "System Uptime", value: "99.9%", icon: CheckCircle, color: "text-emerald-500" },
-              { label: "Threat Level", value: "Low", icon: ShieldAlert, color: "text-blue-500" },
+              { label: "Prevented", value: "1,248", icon: Shield, color: "text-primary" },
+              { label: "Community", value: "5.4k+", icon: Users, color: "text-primary" },
+              { label: "Uptime", value: "99.9%", icon: CheckCircle, color: "text-emerald-500" },
+              { label: "Threat", value: "Low", icon: ShieldAlert, color: "text-blue-500" },
             ].map((stat, i) => (
               <Card key={i} className="border-none shadow-[0_2px_12px_rgba(0,0,0,0.02)] bg-white rounded-2xl md:rounded-3xl transition-all hover:shadow-lg hover:scale-[1.02] duration-300">
-                <CardContent className="p-5 md:p-8">
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-                    <div className="space-y-1 order-2 md:order-1">
-                      <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
-                      <p className="text-xl md:text-3xl font-black text-foreground">{stat.value}</p>
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex flex-col gap-3">
+                    <div className={`p-2 rounded-xl bg-muted/50 ${stat.color} w-fit`}>
+                      <stat.icon className="h-4 w-4" />
                     </div>
-                    <div className={`p-2.5 rounded-xl md:rounded-2xl bg-muted/50 ${stat.color} order-1 md:order-2 w-fit`}>
-                      <stat.icon className="h-4 w-4 md:h-5 md:h-5" />
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
+                      <p className="text-lg md:text-2xl font-black text-foreground">{stat.value}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -152,16 +152,6 @@ export default function Home() {
                         </div>
                       ))}
                     </div>
-                    
-                    <div className="p-5 md:p-6 bg-primary/5 rounded-[1.5rem] md:rounded-[2rem] border border-primary/10">
-                      <h4 className="font-bold text-xs md:text-sm mb-2 flex items-center gap-2">
-                        <ShieldAlert className="h-4 w-4 text-primary" />
-                        Global Threat Intelligence
-                      </h4>
-                      <p className="text-xs md:text-sm text-slate-600 leading-relaxed italic">
-                        {auditResult.threatAnalysis}
-                      </p>
-                    </div>
                   </CardContent>
                 </Card>
               )}
@@ -176,19 +166,16 @@ export default function Home() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6 p-8 md:p-10">
-                  <div className="flex justify-center py-4 md:py-6">
-                    <div className="relative h-32 w-32 md:h-40 md:w-40 flex items-center justify-center rounded-full border-[8px] md:border-[10px] border-white/10">
-                       <div className="absolute inset-0 rounded-full border-[8px] md:border-[10px] border-white border-t-transparent animate-spin-slow"></div>
-                       <span className="text-3xl md:text-4xl font-black">{auditResult ? auditResult.securityScore : '94'}%</span>
+                  <div className="flex justify-center py-4">
+                    <div className="relative h-28 w-28 md:h-32 md:w-32 flex items-center justify-center rounded-full border-[8px] border-white/10">
+                       <div className="absolute inset-0 rounded-full border-[8px] border-white border-t-transparent animate-spin-slow"></div>
+                       <span className="text-2xl md:text-3xl font-black">{auditResult ? auditResult.securityScore : '94'}%</span>
                     </div>
                   </div>
-                  <p className="text-xs md:text-sm text-primary-foreground/90 text-center px-2 md:px-4 leading-relaxed font-medium">
-                    Your communication channels are currently highly protected against biometric fraud.
-                  </p>
                   <Button 
                     onClick={runSecurityAudit}
                     disabled={isAuditing}
-                    className="w-full h-12 md:h-14 rounded-2xl bg-white text-primary hover:bg-slate-50 font-black shadow-lg shadow-black/10 flex items-center justify-center gap-2 group transition-all"
+                    className="w-full h-12 rounded-2xl bg-white text-primary hover:bg-slate-50 font-black shadow-lg shadow-black/10 flex items-center justify-center gap-2 group transition-all"
                   >
                     {isAuditing ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
@@ -200,6 +187,9 @@ export default function Home() {
                       </>
                     )}
                   </Button>
+                  <p className="text-[10px] text-primary-foreground/60 text-center font-bold uppercase tracking-widest flex items-center justify-center gap-1">
+                    Powered by Gemini AI
+                  </p>
                 </CardContent>
               </Card>
 
@@ -209,7 +199,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="border-t border-border bg-white pt-16 md:pt-24 pb-12 mt-12 md:mt-24">
+      <footer className="border-t border-border bg-white pt-16 pb-12 mt-24">
         <div className="container max-w-6xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
           <div className="space-y-6">
             <div className="flex items-center gap-2 font-black text-foreground">
@@ -223,10 +213,18 @@ export default function Home() {
           <div>
             <h4 className="font-bold text-xs uppercase tracking-widest mb-6 text-foreground">Technology</h4>
             <ul className="text-sm space-y-3 text-muted-foreground font-medium">
-              <li className="hover:text-primary transition-colors cursor-pointer">Gemini 2.5 Analysis</li>
-              <li className="hover:text-primary transition-colors cursor-pointer">Face Liveness ML</li>
-              <li className="hover:text-primary transition-colors cursor-pointer">Voice Biometrics</li>
-              <li className="hover:text-primary transition-colors cursor-pointer">Scam Registry</li>
+              <li>Gemini 1.5 Analysis</li>
+              <li>Face Liveness ML</li>
+              <li>Voice Biometrics</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-xs uppercase tracking-widest mb-6 text-foreground">API Resources</h4>
+            <ul className="text-sm space-y-3 text-muted-foreground font-medium">
+              <li className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer">
+                Google AI Studio <ExternalLink className="h-3 w-3" />
+              </li>
+              <li className="hover:text-primary transition-colors cursor-pointer">Security Whitepaper</li>
             </ul>
           </div>
           <div>
@@ -234,21 +232,10 @@ export default function Home() {
             <ul className="text-sm space-y-3 text-muted-foreground font-medium">
               <li className="hover:text-primary transition-colors cursor-pointer">Privacy Policy</li>
               <li className="hover:text-primary transition-colors cursor-pointer">Terms of Service</li>
-              <li className="hover:text-primary transition-colors cursor-pointer">Security Whitepaper</li>
-              <li className="hover:text-primary transition-colors cursor-pointer">Contact Us</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold text-xs uppercase tracking-widest mb-6 text-foreground">Community</h4>
-            <ul className="text-sm space-y-3 text-muted-foreground font-medium">
-              <li className="hover:text-primary transition-colors cursor-pointer">User Forums</li>
-              <li className="hover:text-primary transition-colors cursor-pointer">Security Advocates</li>
-              <li className="hover:text-primary transition-colors cursor-pointer">Developer API</li>
-              <li className="hover:text-primary transition-colors cursor-pointer">Help Center</li>
             </ul>
           </div>
         </div>
-        <div className="container max-w-6xl mx-auto mt-16 md:mt-24 pt-8 border-t border-border/50 text-center text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">
+        <div className="container max-w-6xl mx-auto mt-16 pt-8 border-t border-border/50 text-center text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">
           © {new Date().getFullYear()} Vishwaas Guard. Secure Communication Integrity.
         </div>
       </footer>
