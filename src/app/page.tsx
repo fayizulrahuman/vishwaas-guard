@@ -7,6 +7,7 @@ import { VishwaasHeader } from "@/components/vishwaas-header"
 import { ShieldOverlay } from "@/components/shield-overlay"
 import { ScamSignatures } from "@/components/scam-signatures"
 import { ReportVulnerability } from "@/components/report-vulnerability"
+import { IncomingThreatInterceptor } from "@/components/incoming-threat-interceptor"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Shield, ShieldAlert, Users, CheckCircle, BarChart3, Loader2, Sparkles, ArrowRight, ExternalLink } from "lucide-react"
@@ -75,6 +76,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20">
       <VishwaasHeader />
+      <IncomingThreatInterceptor />
       
       <main className="flex-1 container max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-12 md:space-y-16">
         {/* Hero Section */}
