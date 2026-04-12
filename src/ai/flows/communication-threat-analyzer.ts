@@ -35,6 +35,14 @@ const threatPrompt = ai.definePrompt({
   input: {schema: AnalyzeThreatInputSchema},
   output: {schema: AnalyzeThreatOutputSchema},
   model: 'googleai/gemini-1.5-flash',
+  config: {
+    safetySettings: [
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
+    ],
+  },
   prompt: `You are the Vishwaas Guard Security Intelligence Engine. Your goal is to analyze communication content to detect scams, deepfakes, and social engineering attempts.
 
 Analyze the following:
@@ -57,10 +65,22 @@ const analyzeCommunicationThreatFlow = ai.defineFlow(
     outputSchema: AnalyzeThreatOutputSchema,
   },
   async input => {
-    const {output} = await threatPrompt(input);
-    if (!output) {
-      throw new Error('Failed to generate threat analysis.');
+    try {
+      const {output} = await threatPrompt(input);
+      if (!output) {
+        throw new Error('Safety filter block or empty response.');
+      }
+      return output;
+    } catch (error: any) {
+      console.error('Threat Analysis Error:', error);
+      // Return a safe fallback if the model fails
+      return {
+        riskScore: 50,
+        riskLevel: 'medium',
+        detectedMarkers: ['System timeout or filter hit'],
+        analysis: 'The security engine encountered an issue analyzing this specific content. Please use caution.',
+        immediateAction: 'Do not share sensitive information until a manual review is performed.',
+      };
     }
-    return output;
   }
 );

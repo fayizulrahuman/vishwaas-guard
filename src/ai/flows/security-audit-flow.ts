@@ -34,6 +34,15 @@ const auditPrompt = ai.definePrompt({
   name: 'securityAuditPrompt',
   input: {schema: SecurityAuditInputSchema},
   output: {schema: SecurityAuditOutputSchema},
+  model: 'googleai/gemini-1.5-flash',
+  config: {
+    safetySettings: [
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
+    ],
+  },
   prompt: `You are a high-level security consultant for Vishwaas Guard, an Apple-inspired deepfake protection platform.
 
 Analyze the following security data for the user:

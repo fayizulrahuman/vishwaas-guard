@@ -46,6 +46,14 @@ const deepfakeProbabilityAnalysisPrompt = ai.definePrompt({
   input: {schema: DeepfakeProbabilityAnalysisInputSchema},
   output: {schema: DeepfakeProbabilityAnalysisOutputSchema},
   model: 'googleai/gemini-1.5-flash',
+  config: {
+    safetySettings: [
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
+    ],
+  },
   prompt: `You are an expert deepfake detection system. Your task is to analyze the provided audio and video metadata along with the call context to determine the probability of a deepfake.
 
 Analyze the following inputs:
