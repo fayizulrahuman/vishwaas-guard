@@ -59,7 +59,7 @@ export default function Home() {
 
   if (isUserLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <Loader2 className="h-8 w-8 text-primary animate-spin" />
       </div>
     );
@@ -69,15 +69,15 @@ export default function Home() {
     return <AuthScreen />;
   }
 
-  const parallaxY = scrollY * 0.5; // Optimized speed for the sinking effect
+  const parallaxY = scrollY * 0.5; 
   const opacity = Math.max(0, 1 - scrollY / 600);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background selection:bg-primary/10">
+    <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20">
       <VishwaasHeader />
       
       <main className="flex-1 container max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-12 md:space-y-16">
-        {/* Hero Section - Optimized for visibility */}
+        {/* Hero Section */}
         <section 
           className="space-y-6 md:space-y-8 will-change-transform transition-opacity duration-150"
           style={{ 
@@ -94,14 +94,14 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border border-border bg-white shadow-2xl ring-1 ring-black/5">
+          <div className="rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border border-white/10 bg-black shadow-2xl ring-1 ring-white/5">
             <ShieldOverlay />
           </div>
         </section>
 
         {/* Dashboard Content */}
         <div className="relative z-10 bg-background/95 backdrop-blur-md -mt-16 md:-mt-24 pt-16 md:pt-24 rounded-t-[2.5rem] md:rounded-t-[3.5rem]">
-          {/* Stats Grid - High visibility metrics */}
+          {/* Stats Grid */}
           <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16">
             {[
               { label: "Prevented", value: "1,248", icon: Shield, color: "text-primary" },
@@ -109,10 +109,10 @@ export default function Home() {
               { label: "Uptime", value: "99.9%", icon: CheckCircle, color: "text-emerald-500" },
               { label: "Threat", value: "Low", icon: ShieldAlert, color: "text-blue-500" },
             ].map((stat, i) => (
-              <Card key={i} className="border-none shadow-[0_2px_12px_rgba(0,0,0,0.02)] bg-white rounded-2xl md:rounded-3xl transition-all hover:shadow-lg hover:scale-[1.02] duration-300">
+              <Card key={i} className="border-border bg-card shadow-sm rounded-2xl md:rounded-3xl transition-all hover:shadow-lg hover:scale-[1.02] duration-300">
                 <CardContent className="p-4 md:p-6">
                   <div className="flex flex-col gap-3">
-                    <div className={`p-2 rounded-xl bg-muted/50 ${stat.color} w-fit`}>
+                    <div className={`p-2 rounded-xl bg-white/5 ${stat.color} w-fit`}>
                       <stat.icon className="h-4 w-4" />
                     </div>
                     <div className="space-y-0.5">
@@ -130,25 +130,25 @@ export default function Home() {
               <ScamSignatures />
               
               {auditResult && (
-                <Card id="audit-result" className="border-none bg-slate-50 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <Card id="audit-result" className="border-border bg-white/5 backdrop-blur-md rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <CardHeader className="p-8 md:p-10 pb-4">
                     <div className="flex items-center gap-2 text-primary mb-3">
                       <Sparkles className="h-5 w-5" />
                       <span className="text-[10px] font-black uppercase tracking-widest">AI Audit Result</span>
                     </div>
                     <CardTitle className="text-2xl md:text-3xl font-black">Your Security Score: {auditResult.securityScore}%</CardTitle>
-                    <CardDescription className="text-base md:text-lg text-slate-700 font-medium leading-relaxed mt-2">
+                    <CardDescription className="text-base md:text-lg text-muted-foreground font-medium leading-relaxed mt-2">
                       {auditResult.auditSummary}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-8 p-8 md:p-10 pt-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
                       {auditResult.recommendations.map((rec, i) => (
-                        <div key={i} className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 shadow-sm flex flex-col gap-3">
-                          <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-xs md:text-sm">
+                        <div key={i} className="bg-white/5 p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-white/5 shadow-sm flex flex-col gap-3">
+                          <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-black text-xs md:text-sm">
                             {i + 1}
                           </div>
-                          <p className="text-xs md:text-sm font-semibold text-slate-800 leading-tight">{rec}</p>
+                          <p className="text-xs md:text-sm font-semibold text-foreground leading-tight">{rec}</p>
                         </div>
                       ))}
                     </div>
@@ -158,7 +158,7 @@ export default function Home() {
             </div>
             
             <div className="lg:col-span-4 space-y-8 md:space-y-12">
-              <Card className="bg-primary text-primary-foreground border-none rounded-[2rem] overflow-hidden relative shadow-2xl shadow-primary/30">
+              <Card className="bg-primary text-primary-foreground border-none rounded-[2rem] overflow-hidden relative shadow-2xl shadow-primary/20">
                 <CardHeader className="p-8 md:p-10 pb-0">
                   <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-bold">
                     <BarChart3 className="h-5 w-5" />
@@ -175,7 +175,7 @@ export default function Home() {
                   <Button 
                     onClick={runSecurityAudit}
                     disabled={isAuditing}
-                    className="w-full h-12 rounded-2xl bg-white text-primary hover:bg-slate-50 font-black shadow-lg shadow-black/10 flex items-center justify-center gap-2 group transition-all"
+                    className="w-full h-12 rounded-2xl bg-white text-primary hover:bg-white/90 font-black shadow-lg shadow-black/20 flex items-center justify-center gap-2 group transition-all"
                   >
                     {isAuditing ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
@@ -199,7 +199,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="border-t border-border bg-white pt-16 pb-12 mt-24">
+      <footer className="border-t border-white/5 bg-black pt-16 pb-12 mt-24">
         <div className="container max-w-6xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
           <div className="space-y-6">
             <div className="flex items-center gap-2 font-black text-foreground">
@@ -247,7 +247,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="container max-w-6xl mx-auto mt-16 pt-8 border-t border-border/50 text-center text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">
+        <div className="container max-w-6xl mx-auto mt-16 pt-8 border-t border-white/5 text-center text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">
           © {new Date().getFullYear()} Vishwaas Guard. Secure Communication Integrity.
         </div>
       </footer>

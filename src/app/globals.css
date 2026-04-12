@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* Apple Off-white #F5F5F7 */
-    --foreground: 220 5% 12%; /* Apple Jet Black #1D1D1F */
-    --card: 0 0% 100%;
-    --card-foreground: 220 5% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 5% 12%;
-    --primary: 210 100% 40%; /* Apple Blue #0066CC */
+    --background: 0 0% 0%; /* Absolute Black #000000 */
+    --foreground: 210 20% 98%; /* Apple Off-white #F5F5F7 */
+    --card: 220 5% 8%; /* Dark Charcoal */
+    --card-foreground: 210 20% 98%;
+    --popover: 220 5% 10%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 210 100% 50%; /* Vibrant Apple Blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 20% 95%;
-    --secondary-foreground: 210 100% 40%;
-    --muted: 210 20% 90%;
-    --muted-foreground: 220 5% 45%;
-    --accent: 210 100% 40%;
+    --secondary: 220 10% 15%;
+    --secondary-foreground: 210 100% 55%;
+    --muted: 220 10% 12%;
+    --muted-foreground: 220 5% 60%;
+    --accent: 210 100% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 210 10% 90%;
-    --input: 210 10% 90%;
-    --ring: 210 100% 40%;
-    --radius: 1.25rem; /* 20px for Apple rounded look */
+    --border: 220 10% 18%;
+    --input: 220 10% 18%;
+    --ring: 210 100% 50%;
+    --radius: 1.25rem;
   }
 
   .dark {
@@ -31,21 +31,21 @@
     --foreground: 210 20% 98%;
     --card: 220 5% 8%;
     --card-foreground: 210 20% 98%;
-    --popover: 220 5% 8%;
+    --popover: 220 5% 10%;
     --popover-foreground: 210 20% 98%;
-    --primary: 210 100% 55%;
-    --primary-foreground: 0 0% 0%;
+    --primary: 210 100% 50%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 220 10% 15%;
     --secondary-foreground: 210 100% 55%;
-    --muted: 220 10% 15%;
-    --muted-foreground: 220 5% 65%;
-    --accent: 210 100% 55%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 10% 20%;
-    --input: 220 10% 20%;
-    --ring: 210 100% 55%;
+    --muted: 220 10% 12%;
+    --muted-foreground: 220 5% 60%;
+    --accent: 210 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 10% 18%;
+    --input: 220 10% 18%;
+    --ring: 210 100% 50%;
   }
 }
 
@@ -65,7 +65,7 @@
 }
 
 .glass-card {
-  @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-[0_4px_24px_rgba(0,0,0,0.04)];
+  @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)];
 }
 
 .apple-button {

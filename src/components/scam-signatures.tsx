@@ -62,7 +62,7 @@ export function ScamSignatures() {
     <section className="space-y-8">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="space-y-1">
-          <h2 className="text-2xl md:text-3xl font-black font-headline flex items-center gap-3 tracking-tight">
+          <h2 className="text-2xl md:text-3xl font-black font-headline flex items-center gap-3 tracking-tight text-foreground">
             <AlertTriangle className="text-primary h-7 w-7 md:h-8 md:w-8" />
             Live Scam Signatures
           </h2>
@@ -72,7 +72,7 @@ export function ScamSignatures() {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input 
             placeholder="Search signatures..." 
-            className="pl-10 h-11 md:h-12 bg-white rounded-2xl border-border/60 focus:ring-primary/20 shadow-sm" 
+            className="pl-10 h-11 md:h-12 bg-white/5 rounded-2xl border-white/10 focus:ring-primary/20 shadow-sm text-foreground" 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -82,30 +82,30 @@ export function ScamSignatures() {
       {filteredSignatures.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
           {filteredSignatures.map((sig) => (
-            <Card key={sig.id} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border/40 rounded-3xl overflow-hidden bg-white">
+            <Card key={sig.id} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-white/5 rounded-3xl overflow-hidden bg-card">
               <CardHeader className="p-6 md:p-8 pb-4">
                 <div className="flex justify-between items-start mb-4">
-                  <Badge variant="secondary" className="px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-600 border-none">
+                  <Badge variant="secondary" className="px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-white/5 text-muted-foreground border-none">
                     {sig.category}
                   </Badge>
-                  <Badge className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest ${sig.frequency === 'High' ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'} border-none`} variant="outline">
+                  <Badge className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest ${sig.frequency === 'High' ? 'bg-destructive/20 text-destructive' : 'bg-primary/20 text-primary'} border-none`} variant="outline">
                     {sig.frequency} Risk
                   </Badge>
                 </div>
-                <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors tracking-tight">{sig.title}</CardTitle>
-                <CardDescription className="text-sm font-medium leading-relaxed mt-2 text-slate-500">
+                <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors tracking-tight text-foreground">{sig.title}</CardTitle>
+                <CardDescription className="text-sm font-medium leading-relaxed mt-2 text-muted-foreground">
                   {sig.description}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6 md:p-8 pt-0">
                 <div className="flex flex-wrap gap-2 mb-6">
                   {sig.tags.map(tag => (
-                    <span key={tag} className="text-[10px] px-2.5 py-1 bg-slate-50 border border-slate-100 rounded-lg text-slate-500 uppercase tracking-widest font-black">
+                    <span key={tag} className="text-[10px] px-2.5 py-1 bg-white/5 border border-white/5 rounded-lg text-muted-foreground uppercase tracking-widest font-black">
                       {tag}
                     </span>
                   ))}
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-5 border-t border-slate-50 uppercase font-black tracking-[0.1em]">
+                <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-5 border-t border-white/5 uppercase font-black tracking-[0.1em]">
                   <div className="flex items-center gap-1.5">
                     <Clock className="h-3 w-3" />
                     {sig.lastReported}
@@ -120,17 +120,17 @@ export function ScamSignatures() {
           ))}
         </div>
       ) : (
-        <Card className="border-dashed border-2 bg-slate-50/50 py-16 text-center rounded-[2rem]">
+        <Card className="border-dashed border-2 border-white/10 bg-white/5 py-16 text-center rounded-[2rem]">
           <CardContent>
-            <AlertTriangle className="h-10 w-10 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500 font-bold">No signatures found matching your search.</p>
+            <AlertTriangle className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-muted-foreground font-bold">No signatures found matching your search.</p>
             <Button variant="link" onClick={() => setSearch("")} className="mt-2 text-primary">Clear all filters</Button>
           </CardContent>
         </Card>
       )}
       
       <div className="flex justify-center pt-4">
-        <Button variant="outline" className="rounded-2xl px-8 h-12 border-border/60 hover:bg-slate-50 font-bold gap-2">
+        <Button variant="outline" className="rounded-2xl px-8 h-12 border-white/10 bg-white/5 hover:bg-white/10 text-foreground font-bold gap-2 transition-all">
           View All Signatures
           <ChevronRight className="h-4 w-4" />
         </Button>
