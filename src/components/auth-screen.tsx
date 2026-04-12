@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/firebase';
 import { GoogleIcon } from '@/components/icons/google-icon';
-import { initiateAnonymousSignIn, initiateEmailSignIn } from '@/firebase/non-blocking-login';
+import { initiateAnonymousSignIn, initiateEmailSignIn, initiateEmailSignUp } from '@/firebase/non-blocking-login';
 import { toast } from '@/hooks/use-toast';
 import { GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -28,6 +28,7 @@ const COUNTRY_CODES = [
 export function AuthScreen() {
   const auth = useAuth();
   const [method, setMethod] = useState<'options' | 'email' | 'phone' | 'otp'>('options');
+  const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -68,11 +69,16 @@ export function AuthScreen() {
     }
   };
 
-  const handleEmailLogin = (e: React.FormEvent) => {
+  const handleEmailAuth = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
     setLoading(true);
-    initiateEmailSignIn(auth, email, password, () => setLoading(false));
+    
+    if (isSignUp) {
+      initiateEmailSignUp(auth, email, password, () => setLoading(false));
+    } else {
+      initiateEmailSignIn(auth, email, password, () => setLoading(false));
+    }
   };
 
   const handleGuestLogin = () => {
@@ -114,8 +120,6 @@ export function AuthScreen() {
         description: `A verification code has been sent to ${fullPhoneNumber}.` 
       });
     } catch (error: any) {
-      // Don't nullify the ref here, as the element is already rendered
-      // Only clear if we absolutely have to restart
       toast({ 
         title: "Failed to send OTP", 
         description: error.message, 
@@ -162,14 +166,16 @@ export function AuthScreen() {
           <CardHeader className="pt-10 pb-6">
             <CardTitle className="text-xl text-center">
               {method === 'options' && "Welcome Back"}
-              {method === 'email' && "Sign in with Email"}
+              {method === 'email' && (isSignUp ? "Create Account" : "Sign In")}
               {method === 'phone' && "Sign in with Phone"}
               {method === 'otp' && "Verify Your Identity"}
             </CardTitle>
             <CardDescription className="text-center">
               {method === 'otp' 
                 ? `Enter the 6-digit code sent to ${countryCode}${phone}`
-                : "Choose your preferred secure login method."}
+                : isSignUp && method === 'email' 
+                  ? "Sign up to start protecting your calls."
+                  : "Choose your preferred secure login method."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pb-10">
@@ -196,7 +202,10 @@ export function AuthScreen() {
                 </Button>
 
                 <Button 
-                  onClick={() => setMethod('email')}
+                  onClick={() => {
+                    setMethod('email');
+                    setIsSignUp(false);
+                  }}
                   variant="outline" 
                   className="w-full h-12 rounded-2xl font-semibold border-border hover:bg-slate-50 transition-all gap-3"
                   disabled={loading}
@@ -226,7 +235,7 @@ export function AuthScreen() {
             )}
 
             {method === 'email' && (
-              <form onSubmit={handleEmailLogin} className="space-y-4">
+              <form onSubmit={handleEmailAuth} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   <Input 
@@ -252,9 +261,20 @@ export function AuthScreen() {
                   />
                 </div>
                 <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 font-bold gap-2" disabled={loading}>
-                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Sign In"}
+                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (isSignUp ? "Create Account" : "Sign In")}
                   {!loading && <ArrowRight className="h-4 w-4" />}
                 </Button>
+                
+                <div className="text-center">
+                  <button 
+                    type="button"
+                    onClick={() => setIsSignUp(!isSignUp)}
+                    className="text-xs text-primary font-bold hover:underline"
+                  >
+                    {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Create one"}
+                  </button>
+                </div>
+
                 <Button variant="ghost" onClick={() => setMethod('options')} className="w-full rounded-xl text-muted-foreground" disabled={loading}>
                   Back to options
                 </Button>
@@ -290,9 +310,6 @@ export function AuthScreen() {
                       required
                     />
                   </div>
-                  <p className="text-[10px] text-muted-foreground px-1 leading-relaxed">
-                    Select your country code and enter the remaining digits of your phone number.
-                  </p>
                 </div>
                 <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 font-bold gap-2" disabled={loading}>
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Send OTP Code"}
