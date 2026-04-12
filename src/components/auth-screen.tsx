@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Shield, Mail, Smartphone, ArrowRight, Loader2, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,11 +21,20 @@ export function AuthScreen() {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
+  
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
 
-  // Initialize reCAPTCHA on the client
+  // Initialize and cleanup reCAPTCHA
   useEffect(() => {
     return () => {
-      // Cleanup any reCAPTCHA widgets if necessary
+      if (recaptchaVerifierRef.current) {
+        try {
+          recaptchaVerifierRef.current.clear();
+        } catch (e) {
+          // Ignore clearing errors on unmount
+        }
+        recaptchaVerifierRef.current = null;
+      }
     };
   }, []);
 
@@ -59,16 +68,28 @@ export function AuthScreen() {
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phone) return;
+    if (!phone) {
+      toast({
+        title: "Phone Required",
+        description: "Please enter your phone number in international format (e.g., +1234567890).",
+        variant: "destructive"
+      });
+      return;
+    }
     setLoading(true);
     
     try {
-      // Create invisible reCAPTCHA verifier
-      const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible',
-      });
+      // Create reCAPTCHA verifier if it doesn't exist
+      if (!recaptchaVerifierRef.current) {
+        recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible',
+          callback: () => {
+            // reCAPTCHA solved
+          }
+        });
+      }
       
-      const result = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
+      const result = await signInWithPhoneNumber(auth, phone, recaptchaVerifierRef.current);
       setConfirmationResult(result);
       setMethod('otp');
       toast({ 
@@ -76,6 +97,8 @@ export function AuthScreen() {
         description: "A verification code has been sent to your phone." 
       });
     } catch (error: any) {
+      // If recaptcha fails because it was cleared or expired, reset ref
+      recaptchaVerifierRef.current = null;
       toast({ 
         title: "Failed to send OTP", 
         description: error.message, 
@@ -106,6 +129,7 @@ export function AuthScreen() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F5F5F7] p-6">
+      {/* Invisible reCAPTCHA anchor */}
       <div id="recaptcha-container"></div>
       
       <div className="w-full max-w-[440px] space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -225,16 +249,19 @@ export function AuthScreen() {
             {method === 'phone' && (
               <form onSubmit={handleSendOTP} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone">Phone Number (with country code)</Label>
                   <Input 
                     id="phone" 
                     type="tel" 
-                    placeholder="+15550000000" 
+                    placeholder="+1 555 000 0000" 
                     className="h-12 rounded-xl border-border bg-slate-50/50"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     required
                   />
+                  <p className="text-[10px] text-muted-foreground px-1">
+                    Please use international format, e.g., +1 for USA, +91 for India.
+                  </p>
                 </div>
                 <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 font-bold gap-2" disabled={loading}>
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Send OTP Code"}
