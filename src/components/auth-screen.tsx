@@ -11,6 +11,19 @@ import { GoogleIcon } from '@/components/icons/google-icon';
 import { initiateAnonymousSignIn, initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { toast } from '@/hooks/use-toast';
 import { GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const COUNTRY_CODES = [
+  { code: '+1', label: '🇺🇸 +1', country: 'USA/Canada' },
+  { code: '+91', label: '🇮🇳 +91', country: 'India' },
+  { code: '+44', label: '🇬🇧 +44', country: 'UK' },
+  { code: '+61', label: '🇦🇺 +61', country: 'Australia' },
+  { code: '+971', label: '🇦🇪 +971', country: 'UAE' },
+  { code: '+65', label: '🇸🇬 +65', country: 'Singapore' },
+  { code: '+49', label: '🇩🇪 +49', country: 'Germany' },
+  { code: '+33', label: '🇫🇷 +33', country: 'France' },
+  { code: '+81', label: '🇯🇵 +81', country: 'Japan' },
+];
 
 export function AuthScreen() {
   const auth = useAuth();
@@ -18,6 +31,7 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [countryCode, setCountryCode] = useState('+1');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
@@ -71,13 +85,17 @@ export function AuthScreen() {
     if (!phone) {
       toast({
         title: "Phone Required",
-        description: "Please enter your phone number in international format (e.g., +1234567890).",
+        description: "Please enter your phone number.",
         variant: "destructive"
       });
       return;
     }
     setLoading(true);
     
+    // Clean phone number: remove any non-digit characters
+    const cleanedPhone = phone.replace(/\D/g, '');
+    const fullPhoneNumber = countryCode + cleanedPhone;
+
     try {
       // Create reCAPTCHA verifier if it doesn't exist
       if (!recaptchaVerifierRef.current) {
@@ -89,12 +107,12 @@ export function AuthScreen() {
         });
       }
       
-      const result = await signInWithPhoneNumber(auth, phone, recaptchaVerifierRef.current);
+      const result = await signInWithPhoneNumber(auth, fullPhoneNumber, recaptchaVerifierRef.current);
       setConfirmationResult(result);
       setMethod('otp');
       toast({ 
         title: "OTP Sent", 
-        description: "A verification code has been sent to your phone." 
+        description: `A verification code has been sent to ${fullPhoneNumber}.` 
       });
     } catch (error: any) {
       // If recaptcha fails because it was cleared or expired, reset ref
@@ -153,7 +171,7 @@ export function AuthScreen() {
             </CardTitle>
             <CardDescription className="text-center">
               {method === 'otp' 
-                ? `Enter the 6-digit code sent to ${phone}`
+                ? `Enter the 6-digit code sent to ${countryCode}${phone}`
                 : "Choose your preferred secure login method."}
             </CardDescription>
           </CardHeader>
@@ -249,18 +267,34 @@ export function AuthScreen() {
             {method === 'phone' && (
               <form onSubmit={handleSendOTP} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number (with country code)</Label>
-                  <Input 
-                    id="phone" 
-                    type="tel" 
-                    placeholder="+1 555 000 0000" 
-                    className="h-12 rounded-xl border-border bg-slate-50/50"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                  />
-                  <p className="text-[10px] text-muted-foreground px-1">
-                    Please use international format, e.g., +1 for USA, +91 for India.
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <div className="flex gap-2">
+                    <div className="w-[110px] shrink-0">
+                      <Select value={countryCode} onValueChange={setCountryCode}>
+                        <SelectTrigger className="h-12 rounded-xl border-border bg-slate-50/50">
+                          <SelectValue placeholder="Code" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {COUNTRY_CODES.map((item) => (
+                            <SelectItem key={item.code} value={item.code}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Input 
+                      id="phone" 
+                      type="tel" 
+                      placeholder="555 000 0000" 
+                      className="h-12 flex-1 rounded-xl border-border bg-slate-50/50"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground px-1 leading-relaxed">
+                    Select your country code and enter the remaining digits of your phone number.
                   </p>
                 </div>
                 <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 font-bold gap-2" disabled={loading}>
