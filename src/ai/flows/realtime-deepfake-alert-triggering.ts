@@ -1,7 +1,7 @@
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for real-time deepfake alert triggering.
- * It takes audio and video metadata, calculates a deepfake probability using Gemini 1.5 Flash,
+ * It takes audio and video metadata, calculates a deepfake probability using Gemini 2.5 Flash,
  * and returns the probability along with an explanation.
  *
  * - realtimeDeepfakeAlertTriggering - A function that initiates the deepfake probability calculation.
@@ -79,11 +79,8 @@ const realtimeDeepfakeAlertTriggeringFlow = ai.defineFlow(
     outputSchema: RealtimeDeepfakeAlertTriggeringOutputSchema,
   },
   async input => {
-    // Use the Gemini 1.5 Flash model for this analysis
-    const {output} = await ai.generate({
-      model: 'googleai/gemini-1.5-flash',
-      prompt: prompt(input),
-    });
+    // Calling the executable prompt directly for Genkit 1.x compliance
+    const {output} = await prompt(input);
     return output!;
   }
 );
