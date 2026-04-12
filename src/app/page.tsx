@@ -229,10 +229,22 @@ export default function Home() {
           </div>
           <div>
             <h4 className="font-bold text-xs uppercase tracking-widest mb-6 text-foreground">Company</h4>
-            <ul className="text-sm space-y-3 text-muted-foreground font-medium">
-              <li className="hover:text-primary transition-colors cursor-pointer">Privacy Policy</li>
-              <li className="hover:text-primary transition-colors cursor-pointer">Terms of Service</li>
-            </ul>
+            <div className="flex flex-col items-start gap-1">
+              <Button 
+                variant="link" 
+                className="h-auto p-0 text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
+                onClick={() => toast({ title: "Privacy Policy", description: "Your biometric data never leaves your device." })}
+              >
+                Privacy Policy
+              </Button>
+              <Button 
+                variant="link" 
+                className="h-auto p-0 text-sm text-muted-foreground hover:text-primary font-medium transition-colors"
+                onClick={() => toast({ title: "Terms of Service", description: "Vishwaas Guard is for personal communication protection only." })}
+              >
+                Terms of Service
+              </Button>
+            </div>
           </div>
         </div>
         <div className="container max-w-6xl mx-auto mt-16 pt-8 border-t border-border/50 text-center text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">
