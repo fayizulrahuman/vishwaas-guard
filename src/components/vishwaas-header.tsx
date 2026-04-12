@@ -24,8 +24,6 @@ import { signOut } from "firebase/auth"
 import { toast } from "@/hooks/use-toast"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import Image from "next/image"
-import { PlaceHolderImages } from "@/lib/placeholder-images"
 import { 
   ResponsiveContainer,
   Area,
@@ -53,9 +51,6 @@ export function VishwaasHeader() {
   const auth = useAuth();
   const { user } = useUser();
   
-  // Defensive check for PlaceHolderImages and find the logo
-  const logo = PlaceHolderImages?.find(img => img.id === 'vishwaas-logo');
-  
   const [profileOpen, setProfileOpen] = useState(false);
   const [vaultOpen, setVaultOpen] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
@@ -76,19 +71,10 @@ export function VishwaasHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/40 backdrop-blur-[20px]">
       <div className="container max-w-6xl mx-auto px-6 flex h-20 items-center justify-between">
-        <div className="flex items-center gap-3 font-black text-white">
-          <div className="relative h-12 w-20 overflow-hidden">
-            {logo?.imageUrl ? (
-              <Image 
-                src={logo.imageUrl} 
-                alt="Vishwaas Guard Logo" 
-                fill 
-                className="object-contain"
-                priority
-              />
-            ) : (
-              <Shield className="h-8 w-8 text-primary" />
-            )}
+        <div className="flex items-center gap-4 font-black text-white">
+          <div className="relative h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl">
+            <div className="absolute inset-0 metallic-ring opacity-20"></div>
+            <Shield className="h-7 w-7 text-primary relative z-10" />
           </div>
           <span className="text-xl tracking-tighter uppercase font-black">Vishwaas Guard</span>
         </div>
