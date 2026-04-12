@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect, useRef } from 'react'
@@ -16,6 +17,7 @@ export function ShieldOverlay() {
   const [isScanning, setIsScanning] = useState(false)
   const [status, setStatus] = useState<'idle' | 'secure' | 'warning' | 'critical'>('idle')
   const [analysisText, setAnalysisText] = useState('Standby for scan...')
+  const [isCameraOff, setIsCameraOff] = useState(false)
   
   const scanInterval = useRef<NodeJS.Timeout | null>(null)
 
@@ -32,8 +34,16 @@ export function ShieldOverlay() {
     setIsActive(!isActive)
     if (!isActive) {
       startScanning()
+      toast({
+        title: "Guard Activated",
+        description: "Monitoring communication for deepfake signatures.",
+      })
     } else {
       stopScanning()
+      toast({
+        title: "Guard Deactivated",
+        description: "Scanning has been paused.",
+      })
     }
   }
 
@@ -42,9 +52,7 @@ export function ShieldOverlay() {
     setStatus('secure')
     setAnalysisText('Analyzing voice biometric markers...')
     
-    // Simulate real-time GenAI analysis cycles
     scanInterval.current = setInterval(async () => {
-      // In a real app, we would capture actual media data URIs here
       const mockAudio = "data:audio/wav;base64,UklGRi..."
       const mockVideo = "data:image/jpeg;base64,/9j/4AAQ..."
       
@@ -85,6 +93,24 @@ export function ShieldOverlay() {
     setAnalysisText('Standby for scan...')
   }
 
+  const handleEndCall = () => {
+    toast({
+      title: "Call Terminated",
+      description: "Connection closed safely by Vishwaas Guard.",
+      variant: "destructive"
+    })
+    stopScanning()
+    setIsActive(false)
+  }
+
+  const toggleCamera = () => {
+    setIsCameraOff(!isCameraOff)
+    toast({
+      title: isCameraOff ? "Camera On" : "Privacy Mode Active",
+      description: isCameraOff ? "Video feed restored." : "Video feed masked for privacy.",
+    })
+  }
+
   useEffect(() => {
     return () => { if (scanInterval.current) clearInterval(scanInterval.current) }
   }, [])
@@ -110,13 +136,22 @@ export function ShieldOverlay() {
 
       {/* Camera Feed Simulator */}
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-        <img 
-          src="https://picsum.photos/seed/vishwaas-call/1280/720" 
-          alt="Call Feed" 
-          className="object-cover w-full h-full opacity-50 grayscale-[0.3]"
-          data-ai-hint="video call"
-        />
-        {isActive && <div className="scanline"></div>}
+        {isCameraOff ? (
+          <div className="w-full h-full bg-slate-800 flex flex-col items-center justify-center gap-4 text-slate-500">
+             <Camera className="h-16 w-16 opacity-20" />
+             <p className="text-sm font-bold tracking-widest uppercase">Video Paused</p>
+          </div>
+        ) : (
+          <>
+            <img 
+              src="https://picsum.photos/seed/vishwaas-call/1280/720" 
+              alt="Call Feed" 
+              className="object-cover w-full h-full opacity-50 grayscale-[0.3]"
+              data-ai-hint="video call"
+            />
+            {isActive && <div className="scanline"></div>}
+          </>
+        )}
       </div>
 
       {/* HUD Overlay */}
@@ -127,7 +162,7 @@ export function ShieldOverlay() {
               {isActive ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
               {isActive ? "Shield Active" : "Shield Standby"}
             </Badge>
-            {isActive && (
+            {isActive && !isCameraOff && (
               <Badge variant="outline" className="bg-black/40 text-white border-white/20 animate-pulse">
                 REC • Liveness Scan: ON
               </Badge>
@@ -164,10 +199,10 @@ export function ShieldOverlay() {
             </Card>
 
             <div className="flex gap-2 pointer-events-auto">
-               <Button size="icon" variant="destructive" className="h-12 w-12 rounded-full shadow-lg">
+               <Button onClick={handleEndCall} size="icon" variant="destructive" className="h-12 w-12 rounded-full shadow-lg">
                  <PhoneOff className="h-6 w-6" />
                </Button>
-               <Button size="icon" variant="secondary" className="h-12 w-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur border-none text-white">
+               <Button onClick={toggleCamera} size="icon" variant="secondary" className={`h-12 w-12 rounded-full backdrop-blur border-none ${isCameraOff ? 'bg-white text-slate-900' : 'bg-white/20 text-white'} hover:bg-white/30`}>
                  <Camera className="h-6 w-6" />
                </Button>
             </div>
@@ -194,7 +229,7 @@ export function ShieldOverlay() {
            <Button 
             onClick={toggleShield}
             variant="ghost" 
-            className="text-white bg-black/40 hover:bg-black/60 rounded-full px-4 h-8 border border-white/10 text-xs"
+            className="text-white bg-black/40 hover:bg-black/60 rounded-full px-4 h-8 border border-white/10 text-xs pointer-events-auto"
            >
              Deactivate Shield
            </Button>

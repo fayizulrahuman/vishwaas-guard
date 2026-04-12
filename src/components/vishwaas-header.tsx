@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Shield, Bell, User } from "lucide-react"
@@ -6,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useAuth, useUser } from "@/firebase"
 import { signOut } from "firebase/auth"
+import { toast } from "@/hooks/use-toast"
 
 export function VishwaasHeader() {
   const auth = useAuth();
@@ -14,6 +16,13 @@ export function VishwaasHeader() {
   const handleSignOut = () => {
     signOut(auth);
   };
+
+  const handleNotifications = () => {
+    toast({
+      title: "Security Notifications",
+      description: "No new security alerts detected. Your perimeter is secure.",
+    })
+  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-white/70 backdrop-blur-xl">
@@ -24,14 +33,14 @@ export function VishwaasHeader() {
         </div>
         
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full hover:bg-slate-100">
+          <Button onClick={handleNotifications} variant="ghost" size="icon" className="relative h-10 w-10 rounded-full hover:bg-slate-100">
             <Bell className="h-5 w-5 text-slate-600" />
             <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-primary shadow-sm"></span>
           </Button>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full border border-border overflow-hidden">
+              <Button variant="ghost" className="relative h-10 w-10 rounded-full border border-border overflow-hidden p-0">
                 <Avatar className="h-full w-full">
                   <AvatarImage src={user?.photoURL || "https://picsum.photos/seed/vishwaas-user/100/100"} alt="User" />
                   <AvatarFallback><User /></AvatarFallback>
