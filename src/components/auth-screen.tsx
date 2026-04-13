@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, Mail, ArrowRight, Loader2, Lock } from 'lucide-react';
+import { Shield, Mail, ArrowRight, Loader2, Lock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -76,7 +76,8 @@ export function AuthScreen() {
 
         <Card className="glass-panel border-white/10 bg-white/5 shadow-2xl backdrop-blur-3xl rounded-[2.5rem] overflow-hidden">
           <CardHeader className="pt-12 pb-8">
-            <CardTitle className="text-2xl text-center text-white font-black tracking-tight">
+            <CardTitle className="text-2xl text-center text-white font-black tracking-tight flex items-center justify-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
               {method === 'options' ? "Secure Entry" : (isSignUp ? "Create Identity" : "Access Perimeter")}
             </CardTitle>
             <CardDescription className="text-center text-[#8E8E93] font-medium px-4">

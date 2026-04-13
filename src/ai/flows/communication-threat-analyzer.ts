@@ -2,10 +2,6 @@
 /**
  * @fileOverview This file defines a Genkit flow for analyzing suspicious communication.
  * It uses Gemini to identify scam markers and provide a risk assessment.
- *
- * - analyzeCommunicationThreat - Function to analyze a piece of communication.
- * - AnalyzeThreatInput - Input type for the analysis.
- * - AnalyzeThreatOutput - Output type for the analysis.
  */
 
 import {ai} from '@/ai/genkit';
@@ -34,7 +30,7 @@ const threatPrompt = ai.definePrompt({
   name: 'analyzeCommunicationThreatPrompt',
   input: {schema: AnalyzeThreatInputSchema},
   output: {schema: AnalyzeThreatOutputSchema},
-  model: 'googleai/gemini-1.5-flash',
+  // Use default model from ai instance
   config: {
     safetySettings: [
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
@@ -73,11 +69,10 @@ const analyzeCommunicationThreatFlow = ai.defineFlow(
       return output;
     } catch (error: any) {
       console.error('Threat Analysis Error:', error);
-      // Return a safe fallback if the model fails
       return {
         riskScore: 50,
         riskLevel: 'medium',
-        detectedMarkers: ['System timeout or filter hit'],
+        detectedMarkers: ['System analysis hit a fallback limit'],
         analysis: 'The security engine encountered an issue analyzing this specific content. Please use caution.',
         immediateAction: 'Do not share sensitive information until a manual review is performed.',
       };
