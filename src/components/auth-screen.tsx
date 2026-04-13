@@ -148,29 +148,37 @@ export function AuthScreen() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F5F5F7] p-6">
+    <div className="min-h-screen flex items-center justify-center bg-black p-6 relative overflow-hidden">
+      {/* Background Volumetric Spheres */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="bg-sphere sphere-blue -top-40 -left-40 animate-float" style={{ animationDelay: '0s' }}></div>
+        <div className="bg-sphere sphere-blue top-1/4 -right-20 animate-float" style={{ animationDelay: '-3s' }}></div>
+        <div className="bg-sphere sphere-orange -bottom-60 left-1/2 -translate-x-1/2 opacity-30 animate-float" style={{ animationDelay: '-5s' }}></div>
+      </div>
+
       <div id="recaptcha-container"></div>
       
-      <div className="w-full max-w-[440px] space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      <div className="relative z-10 w-full max-w-[440px] space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
         <div className="text-center space-y-2">
           <div className="flex justify-center mb-6">
-            <div className="h-20 w-20 rounded-[2rem] bg-white shadow-xl flex items-center justify-center border border-white/20">
-              <Shield className="h-10 w-10 text-primary" />
+            <div className="relative h-20 w-20 rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl">
+              <div className="absolute inset-0 metallic-ring opacity-20"></div>
+              <Shield className="h-10 w-10 text-primary relative z-10" />
             </div>
           </div>
-          <h1 className="text-3xl font-black text-foreground tracking-tight">Vishwaas Guard</h1>
-          <p className="text-muted-foreground font-medium">Secure your communication, build trust.</p>
+          <h1 className="text-3xl font-black text-white tracking-tight">Vishwaas Guard</h1>
+          <p className="text-[#8E8E93] text-[10px] font-black uppercase tracking-[0.2em]">Secure your communication, build trust.</p>
         </div>
 
-        <Card className="border-none shadow-[0_4px_24px_rgba(0,0,0,0.04)] bg-white/80 backdrop-blur-2xl rounded-[2.5rem] overflow-hidden">
+        <Card className="glass-panel border-white/10 bg-white/5 shadow-2xl backdrop-blur-3xl rounded-[2.5rem] overflow-hidden">
           <CardHeader className="pt-10 pb-6">
-            <CardTitle className="text-xl text-center">
+            <CardTitle className="text-xl text-center text-white">
               {method === 'options' && "Welcome Back"}
               {method === 'email' && (isSignUp ? "Create Account" : "Sign In")}
               {method === 'phone' && "Sign in with Phone"}
               {method === 'otp' && "Verify Your Identity"}
             </CardTitle>
-            <CardDescription className="text-center">
+            <CardDescription className="text-center text-[#8E8E93] font-medium">
               {method === 'otp' 
                 ? `Enter the 6-digit code sent to ${countryCode}${phone}`
                 : isSignUp && method === 'email' 
@@ -184,7 +192,7 @@ export function AuthScreen() {
                 <Button 
                   onClick={handleGoogleLogin} 
                   variant="outline" 
-                  className="w-full h-12 rounded-2xl font-semibold border-border hover:bg-slate-50 transition-all gap-3"
+                  className="w-full h-12 rounded-2xl font-semibold border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all gap-3"
                   disabled={loading}
                 >
                   <GoogleIcon className="h-5 w-5" />
@@ -194,10 +202,10 @@ export function AuthScreen() {
                 <Button 
                   onClick={() => setMethod('phone')}
                   variant="outline" 
-                  className="w-full h-12 rounded-2xl font-semibold border-border hover:bg-slate-50 transition-all gap-3"
+                  className="w-full h-12 rounded-2xl font-semibold border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all gap-3"
                   disabled={loading}
                 >
-                  <Smartphone className="h-5 w-5 text-slate-600" />
+                  <Smartphone className="h-5 w-5 text-[#8E8E93]" />
                   Continue with Phone
                 </Button>
 
@@ -207,26 +215,26 @@ export function AuthScreen() {
                     setIsSignUp(false);
                   }}
                   variant="outline" 
-                  className="w-full h-12 rounded-2xl font-semibold border-border hover:bg-slate-50 transition-all gap-3"
+                  className="w-full h-12 rounded-2xl font-semibold border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all gap-3"
                   disabled={loading}
                 >
-                  <Mail className="h-5 w-5 text-slate-600" />
+                  <Mail className="h-5 w-5 text-[#8E8E93]" />
                   Continue with Email
                 </Button>
 
                 <div className="relative py-4">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-border"></span>
+                    <span className="w-full border-t border-white/10"></span>
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white px-2 text-muted-foreground font-bold tracking-widest">Or</span>
+                    <span className="bg-black/40 px-2 text-[#8E8E93] font-black tracking-widest">Or</span>
                   </div>
                 </div>
 
                 <Button 
                   onClick={handleGuestLogin}
                   variant="ghost" 
-                  className="w-full h-12 rounded-2xl font-semibold text-muted-foreground hover:text-foreground transition-all"
+                  className="w-full h-12 rounded-2xl font-black text-[#8E8E93] hover:text-white transition-all"
                   disabled={loading}
                 >
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Continue as Guest"}
@@ -237,30 +245,30 @@ export function AuthScreen() {
             {method === 'email' && (
               <form onSubmit={handleEmailAuth} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email" className="text-white">Email Address</Label>
                   <Input 
                     id="email" 
                     type="email" 
                     placeholder="name@example.com" 
-                    className="h-12 rounded-xl border-border bg-slate-50/50"
+                    className="h-12 rounded-xl border-white/10 bg-white/5 text-white placeholder:text-[#8E8E93]"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="text-white">Password</Label>
                   <Input 
                     id="password" 
                     type="password" 
                     placeholder="••••••••" 
-                    className="h-12 rounded-xl border-border bg-slate-50/50"
+                    className="h-12 rounded-xl border-white/10 bg-white/5 text-white placeholder:text-[#8E8E93]"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 font-bold gap-2" disabled={loading}>
+                <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black gap-2 shadow-lg shadow-primary/20" disabled={loading}>
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (isSignUp ? "Create Account" : "Sign In")}
                   {!loading && <ArrowRight className="h-4 w-4" />}
                 </Button>
@@ -269,13 +277,13 @@ export function AuthScreen() {
                   <button 
                     type="button"
                     onClick={() => setIsSignUp(!isSignUp)}
-                    className="text-xs text-primary font-bold hover:underline"
+                    className="text-xs text-primary font-black hover:underline"
                   >
                     {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Create one"}
                   </button>
                 </div>
 
-                <Button variant="ghost" onClick={() => setMethod('options')} className="w-full rounded-xl text-muted-foreground" disabled={loading}>
+                <Button variant="ghost" onClick={() => setMethod('options')} className="w-full rounded-xl text-[#8E8E93] hover:text-white font-bold" disabled={loading}>
                   Back to options
                 </Button>
               </form>
@@ -284,16 +292,16 @@ export function AuthScreen() {
             {method === 'phone' && (
               <form onSubmit={handleSendOTP} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone" className="text-white">Phone Number</Label>
                   <div className="flex gap-2">
                     <div className="w-[110px] shrink-0">
                       <Select value={countryCode} onValueChange={setCountryCode}>
-                        <SelectTrigger className="h-12 rounded-xl border-border bg-slate-50/50">
+                        <SelectTrigger className="h-12 rounded-xl border-white/10 bg-white/5 text-white">
                           <SelectValue placeholder="Code" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-black/90 border-white/10 text-white backdrop-blur-3xl">
                           {COUNTRY_CODES.map((item) => (
-                            <SelectItem key={item.code} value={item.code}>
+                            <SelectItem key={item.code} value={item.code} className="focus:bg-white/10">
                               {item.label}
                             </SelectItem>
                           ))}
@@ -304,18 +312,18 @@ export function AuthScreen() {
                       id="phone" 
                       type="tel" 
                       placeholder="555 000 0000" 
-                      className="h-12 flex-1 rounded-xl border-border bg-slate-50/50"
+                      className="h-12 flex-1 rounded-xl border-white/10 bg-white/5 text-white placeholder:text-[#8E8E93]"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       required
                     />
                   </div>
                 </div>
-                <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 font-bold gap-2" disabled={loading}>
+                <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black gap-2 shadow-lg shadow-primary/20" disabled={loading}>
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Send OTP Code"}
                   {!loading && <ArrowRight className="h-4 w-4" />}
                 </Button>
-                <Button variant="ghost" onClick={() => setMethod('options')} className="w-full rounded-xl text-muted-foreground" disabled={loading}>
+                <Button variant="ghost" onClick={() => setMethod('options')} className="w-full rounded-xl text-[#8E8E93] hover:text-white font-bold" disabled={loading}>
                   Back to options
                 </Button>
               </form>
@@ -324,26 +332,26 @@ export function AuthScreen() {
             {method === 'otp' && (
               <form onSubmit={handleVerifyOTP} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="otp">Verification Code</Label>
+                  <Label htmlFor="otp" className="text-white">Verification Code</Label>
                   <Input 
                     id="otp" 
                     type="text" 
                     placeholder="000000" 
                     maxLength={6}
-                    className="h-12 rounded-xl border-border bg-slate-50/50 text-center tracking-[1em] text-lg font-bold"
+                    className="h-12 rounded-xl border-white/10 bg-white/5 text-white text-center tracking-[1em] text-lg font-black"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 font-bold gap-2" disabled={loading}>
+                <Button type="submit" className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black gap-2 shadow-lg shadow-primary/20" disabled={loading}>
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Verify & Continue"}
                   {!loading && <KeyRound className="h-4 w-4" />}
                 </Button>
                 <Button 
                   variant="ghost" 
                   onClick={() => setMethod('phone')} 
-                  className="w-full rounded-xl text-muted-foreground" 
+                  className="w-full rounded-xl text-[#8E8E93] hover:text-white font-bold" 
                   disabled={loading}
                 >
                   Change phone number
@@ -353,8 +361,8 @@ export function AuthScreen() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground font-medium px-8 leading-relaxed">
-          By continuing, you agree to Vishwaas Guard's <span className="underline cursor-pointer">Terms of Service</span> and <span className="underline cursor-pointer">Privacy Policy</span>.
+        <p className="text-center text-[10px] text-[#8E8E93] font-black uppercase tracking-[0.2em] px-8 leading-relaxed">
+          By continuing, you agree to Vishwaas Guard's <span className="underline cursor-pointer hover:text-white">Terms</span> and <span className="underline cursor-pointer hover:text-white">Privacy Policy</span>.
         </p>
       </div>
     </div>
