@@ -80,7 +80,7 @@ export function AuthScreen() {
           </div>
         </div>
 
-        <Card className="frosted-glass border-white/10 shadow-[0_32px_64px_rgba(0,0,0,0.6)] rounded-[2.5rem] md:rounded-[3rem] overflow-hidden">
+        <Card className="frosted-glass border-white/10 shadow-[0_32px_64px_rgba(0,0,0,0.6)] rounded-[2.5rem] md:rounded-[3rem] overflow-hidden bg-black/40 backdrop-blur-[60px]">
           <CardHeader className="pt-8 md:pt-12 pb-6 md:pb-8">
             <CardTitle className="text-xl md:text-2xl text-center text-white font-black tracking-tight flex items-center justify-center gap-2">
               <Sparkles className="h-4 w-4 md:h-5 md:h-5 text-primary" />

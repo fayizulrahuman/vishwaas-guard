@@ -89,10 +89,10 @@ export function ShieldOverlay() {
 
       {!privacyConsent && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[40px] md:backdrop-blur-[60px] p-6 md:p-8 text-center animate-in fade-in duration-1000">
-          <div className="max-w-md w-full space-y-8 md:space-y-12 animate-in fade-in zoom-in-95 duration-1000">
+          <div className="max-w-md w-full space-y-8 md:space-y-12 animate-in fade-in zoom-in-95 duration-1000 frosted-glass p-8 md:p-12 rounded-[40px]">
             <div className="relative h-24 w-24 md:h-32 md:w-32 mx-auto flex items-center justify-center">
               <div className="absolute inset-0 metallic-ring animate-spin-slow opacity-60"></div>
-              <div className="h-16 w-16 md:h-24 md:w-24 rounded-full frosted-glass flex items-center justify-center border-white/30 shadow-[0_0_40px_rgba(0,102,255,0.3)]">
+              <div className="h-16 w-16 md:h-24 md:w-24 rounded-full bg-white/5 flex items-center justify-center border-white/30 shadow-[0_0_40px_rgba(0,102,255,0.3)]">
                 <Fingerprint className="h-8 w-8 md:h-12 md:w-12 text-primary drop-shadow-[0_0_8px_rgba(0,102,255,0.8)]" />
               </div>
             </div>

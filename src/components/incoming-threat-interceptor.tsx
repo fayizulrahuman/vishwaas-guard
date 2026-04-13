@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Shield, ShieldAlert, X, Check, Loader2, MessageSquare, Phone, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, X, Check, Loader2, MessageSquare, Phone, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
