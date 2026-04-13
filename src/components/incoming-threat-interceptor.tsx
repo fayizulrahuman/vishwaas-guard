@@ -32,7 +32,7 @@ export function IncomingThreatInterceptor() {
         content: 'Unknown voice signature detected. The caller is requesting urgent account verification.',
       });
       setOpen(true);
-    }, 8000);
+    }, 12000); // Delayed slightly for premium pacing
 
     return () => clearTimeout(timer);
   }, []);
@@ -74,50 +74,50 @@ export function IncomingThreatInterceptor() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="frosted-glass border-white/10 rounded-[2.5rem] max-w-md backdrop-blur-3xl p-0 overflow-hidden shadow-[0_0_80px_rgba(0,102,255,0.2)] bg-black/40">
-        <div className="p-8 space-y-8 relative">
-          <div className="absolute -top-20 -right-20 h-40 w-40 metallic-ring opacity-10 rotate-45 pointer-events-none"></div>
+      <DialogContent className="frosted-glass border-white/20 rounded-[3rem] max-w-md backdrop-blur-[80px] p-0 overflow-hidden shadow-[0_0_120px_rgba(0,102,255,0.3)] bg-black/40">
+        <div className="p-10 space-y-10 relative">
+          <div className="absolute -top-24 -right-24 h-48 w-48 metallic-ring opacity-20 rotate-45 pointer-events-none"></div>
           
           <DialogHeader className="items-center text-center">
-            <div className="relative mb-6">
-              <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"></div>
-              <div className="relative p-5 rounded-[2rem] bg-white/5 border border-white/10 shadow-2xl">
-                <ShieldAlert className="h-10 w-10 text-primary" />
+            <div className="relative mb-8">
+              <div className="absolute inset-0 bg-primary/30 blur-3xl rounded-full scale-150"></div>
+              <div className="relative p-6 rounded-[2.5rem] bg-white/5 border border-white/20 shadow-2xl backdrop-blur-3xl">
+                <ShieldAlert className="h-12 w-12 text-primary drop-shadow-[0_0_10px_rgba(0,102,255,0.8)]" />
               </div>
             </div>
-            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 mb-3 font-black tracking-widest uppercase text-[10px] px-4 py-1.5 rounded-full">
+            <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30 mb-4 font-black tracking-[0.4em] uppercase text-[10px] px-5 py-2 rounded-full">
               Unknown Source Detected
             </Badge>
-            <DialogTitle className="text-3xl font-black text-white tracking-tight leading-tight">
+            <DialogTitle className="text-4xl font-black text-white tracking-tighter leading-tight">
               Authorize<br />Security Scan?
             </DialogTitle>
-            <DialogDescription className="text-[#8E8E93] font-medium text-base leading-relaxed mt-4">
-              Vishwaas Guard has intercepted an unknown {incomingEvent?.type}. Unlock the security layer to analyze deepfake signatures.
+            <DialogDescription className="text-[#8E8E93] font-medium text-lg leading-relaxed mt-6">
+              Vishwaas Guard intercepted an unknown {incomingEvent?.type}. Unlock the security layer to analyze deepfake signatures.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="bg-white/5 border border-white/10 rounded-[24px] p-6 flex items-center gap-5 backdrop-blur-md">
-            <div className="h-12 w-12 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-center text-white/60 shadow-inner">
-              {incomingEvent?.type === 'call' ? <Phone className="h-6 w-6" /> : <MessageSquare className="h-6 w-6" />}
+          <div className="bg-white/5 border border-white/10 rounded-[32px] p-8 flex items-center gap-6 backdrop-blur-3xl shadow-inner">
+            <div className="h-16 w-16 rounded-[24px] bg-black/40 border border-white/10 flex items-center justify-center text-white/80 shadow-2xl">
+              {incomingEvent?.type === 'call' ? <Phone className="h-8 w-8" /> : <MessageSquare className="h-8 w-8" />}
             </div>
             <div className="flex-1">
-              <p className="text-[10px] font-black text-[#8E8E93] uppercase tracking-[0.2em] mb-0.5">Source ID</p>
-              <p className="text-lg font-bold text-white tracking-tight">{incomingEvent?.source}</p>
+              <p className="text-[10px] font-black text-[#8E8E93] uppercase tracking-[0.3em] mb-1">Source ID</p>
+              <p className="text-xl font-bold text-white tracking-tight">{incomingEvent?.source}</p>
             </div>
           </div>
 
           {!analysisResult ? (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-5">
               <Button 
                 onClick={handleAuthorizeScan} 
                 disabled={isAnalyzing}
-                className="w-full h-16 rounded-[24px] bg-white text-black hover:bg-white/90 font-black shadow-2xl gap-3 text-lg transition-all active:scale-95"
+                className="w-full h-20 rounded-[32px] bg-white text-black hover:bg-white/90 font-black shadow-2xl gap-4 text-xl transition-all active:scale-95"
               >
                 {isAnalyzing ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <Loader2 className="h-7 w-7 animate-spin" />
                 ) : (
                   <>
-                    <Check className="h-6 w-6" />
+                    <Check className="h-7 w-7" />
                     Authorize Scan
                   </>
                 )}
@@ -125,42 +125,42 @@ export function IncomingThreatInterceptor() {
               <Button 
                 onClick={handleDismiss}
                 variant="ghost" 
-                className="w-full h-12 rounded-2xl text-[#8E8E93] hover:text-white hover:bg-white/5 font-black uppercase tracking-widest text-xs transition-colors"
+                className="w-full h-14 rounded-[20px] text-[#8E8E93] hover:text-white hover:bg-white/5 font-black uppercase tracking-[0.4em] text-[10px] transition-colors"
               >
                 Skip Protection
               </Button>
             </div>
           ) : (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
-              <div className={`p-6 rounded-[32px] border ${analysisResult.riskLevel === 'critical' ? 'bg-destructive/10 border-destructive/30' : 'bg-emerald-500/10 border-emerald-500/30'} backdrop-blur-xl relative overflow-hidden group`}>
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-50 pointer-events-none"></div>
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+              <div className={`p-8 rounded-[40px] border ${analysisResult.riskLevel === 'critical' ? 'bg-destructive/10 border-destructive/40 shadow-[0_0_40px_rgba(239,68,68,0.2)]' : 'bg-emerald-500/10 border-emerald-500/40 shadow-[0_0_40px_rgba(16,185,129,0.2)]'} backdrop-blur-3xl relative overflow-hidden`}>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50 pointer-events-none"></div>
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-3">
-                      <AlertTriangle className={`h-6 w-6 ${analysisResult.riskLevel === 'critical' ? 'text-destructive' : 'text-emerald-500'}`} />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Risk Integrity</span>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                      <AlertTriangle className={`h-8 w-8 ${analysisResult.riskLevel === 'critical' ? 'text-destructive' : 'text-emerald-500'}`} />
+                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70">Risk Integrity</span>
                     </div>
-                    <Badge className={`font-black tracking-widest px-3 py-1 rounded-lg ${analysisResult.riskLevel === 'critical' ? 'bg-destructive text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)]'}`}>
+                    <Badge className={`font-black tracking-[0.2em] px-4 py-1.5 rounded-xl ${analysisResult.riskLevel === 'critical' ? 'bg-destructive text-white shadow-2xl' : 'bg-emerald-500 text-white shadow-2xl'}`}>
                       {analysisResult.riskLevel.toUpperCase()}
                     </Badge>
                   </div>
-                  <p className="text-2xl font-black text-white mb-3 tracking-tighter">{analysisResult.riskScore}% Scam Probability</p>
-                  <p className="text-sm text-[#8E8E93] leading-relaxed font-medium mb-6">
+                  <p className="text-3xl font-black text-white mb-4 tracking-tighter">{analysisResult.riskScore}% Scam Probability</p>
+                  <p className="text-base text-[#8E8E93] leading-relaxed font-medium mb-8">
                     {analysisResult.analysis}
                   </p>
-                  <div className="p-5 bg-black/40 rounded-[20px] border border-white/10 shadow-inner">
-                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2">Security Directive</p>
-                    <p className="text-sm font-bold text-white leading-snug">{analysisResult.immediateAction}</p>
+                  <div className="p-6 bg-black/40 rounded-[24px] border border-white/10 shadow-inner">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mb-3">Security Directive</p>
+                    <p className="text-base font-bold text-white leading-snug">{analysisResult.immediateAction}</p>
                   </div>
                 </div>
               </div>
-              <Button onClick={handleDismiss} className="w-full h-14 rounded-[24px] bg-white text-black font-black hover:bg-white/90 shadow-2xl transition-all">
+              <Button onClick={handleDismiss} className="w-full h-16 rounded-[28px] bg-white text-black font-black hover:bg-white/90 shadow-2xl transition-all active:scale-95">
                 Acknowledge & Close
               </Button>
             </div>
           )}
         </div>
-        <div className="h-1 w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+        <div className="h-2 w-full bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
       </DialogContent>
     </Dialog>
   );

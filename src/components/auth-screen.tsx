@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, Mail, ArrowRight, Loader2, Lock, Sparkles } from 'lucide-react';
+import { Shield, Mail, ArrowRight, Loader2, Lock, Sparkles, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -26,9 +26,13 @@ export function AuthScreen() {
     try {
       await signInWithPopup(auth, provider);
     } catch (error: any) {
+      let description = error.message;
+      if (error.code === 'auth/popup-blocked') {
+        description = "Your browser blocked the login popup. Please allow popups for this site or try Email login.";
+      }
       toast({
         title: "Login Failed",
-        description: error.message,
+        description,
         variant: "destructive"
       });
     } finally {
@@ -55,26 +59,28 @@ export function AuthScreen() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black p-6 relative overflow-hidden">
-      {/* Volumetric Background Spheres */}
+      {/* Volumetric Background Spheres - High Fidelity */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="bg-sphere sphere-blue -top-40 -left-40 animate-float" style={{ animationDelay: '0s' }}></div>
-        <div className="bg-sphere sphere-blue top-1/4 -right-20 animate-float" style={{ animationDelay: '-3s' }}></div>
-        <div className="bg-sphere sphere-orange -bottom-60 left-1/2 -translate-x-1/2 opacity-30 animate-float" style={{ animationDelay: '-5s' }}></div>
+        <div className="bg-sphere sphere-blue top-1/3 -right-20 animate-float opacity-30" style={{ animationDelay: '-3s' }}></div>
+        <div className="bg-sphere sphere-orange -bottom-60 left-1/2 -translate-x-1/2 opacity-20 animate-float" style={{ animationDelay: '-5s' }}></div>
       </div>
       
-      <div className="relative z-10 w-full max-w-[440px] space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-        <div className="text-center space-y-4">
-          <div className="flex justify-center mb-6">
-            <div className="relative h-24 w-24 rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl">
-              <div className="absolute inset-0 metallic-ring opacity-20"></div>
-              <Shield className="h-12 w-12 text-primary relative z-10" />
+      <div className="relative z-10 w-full max-w-[440px] space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div className="text-center space-y-6">
+          <div className="flex justify-center">
+            <div className="relative h-24 w-24 rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl backdrop-blur-xl group">
+              <div className="absolute inset-0 metallic-ring opacity-30 group-hover:opacity-60 transition-opacity"></div>
+              <Shield className="h-12 w-12 text-primary relative z-10 drop-shadow-[0_0_15px_rgba(0,102,255,0.5)]" />
             </div>
           </div>
-          <h1 className="text-3xl font-black text-white tracking-tighter uppercase">Vishwaas Guard</h1>
-          <p className="text-[#8E8E93] text-[10px] font-black uppercase tracking-[0.3em]">Integrity. Filtered by Glass.</p>
+          <div className="space-y-2">
+            <h1 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">Vishwaas Guard</h1>
+            <p className="text-[#8E8E93] text-[10px] font-black uppercase tracking-[0.4em]">Integrity. Filtered by Glass.</p>
+          </div>
         </div>
 
-        <Card className="glass-panel border-white/10 bg-white/5 shadow-2xl backdrop-blur-3xl rounded-[2.5rem] overflow-hidden">
+        <Card className="frosted-glass border-white/10 shadow-[0_32px_64px_rgba(0,0,0,0.6)] rounded-[3rem] overflow-hidden">
           <CardHeader className="pt-12 pb-8">
             <CardTitle className="text-2xl text-center text-white font-black tracking-tight flex items-center justify-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
@@ -90,7 +96,7 @@ export function AuthScreen() {
                 <Button 
                   onClick={handleGoogleLogin} 
                   variant="outline" 
-                  className="w-full h-14 rounded-2xl font-bold border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all gap-3 shadow-sm"
+                  className="w-full h-16 rounded-[24px] font-bold border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all gap-4 shadow-sm backdrop-blur-md active:scale-95"
                   disabled={loading}
                 >
                   <GoogleIcon className="h-5 w-5" />
@@ -103,71 +109,71 @@ export function AuthScreen() {
                     setIsSignUp(false);
                   }}
                   variant="outline" 
-                  className="w-full h-14 rounded-2xl font-bold border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all gap-3 shadow-sm"
+                  className="w-full h-16 rounded-[24px] font-bold border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all gap-4 shadow-sm backdrop-blur-md active:scale-95"
                   disabled={loading}
                 >
                   <Mail className="h-5 w-5 text-[#8E8E93]" />
                   Continue with Email
                 </Button>
 
-                <div className="relative py-6">
+                <div className="relative py-8">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-white/5"></span>
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-black/40 px-3 text-[#8E8E93] font-black tracking-widest text-[9px]">Demo Environment</span>
+                    <span className="bg-black/20 backdrop-blur-xl px-4 text-[#8E8E93] font-black tracking-[0.3em] text-[9px] rounded-full py-1">Secure Protocol</span>
                   </div>
                 </div>
 
                 <Button 
                   onClick={handleGuestLogin}
                   variant="ghost" 
-                  className="w-full h-14 rounded-2xl font-black text-[#8E8E93] hover:text-white transition-all uppercase tracking-widest text-xs"
+                  className="w-full h-14 rounded-[20px] font-black text-[#8E8E93] hover:text-white transition-all uppercase tracking-[0.3em] text-[10px]"
                   disabled={loading}
                 >
-                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Access as Guest"}
+                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Access as Anonymous Peer"}
                 </Button>
               </div>
             )}
 
             {method === 'email' && (
-              <form onSubmit={handleEmailAuth} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-[#8E8E93] ml-1">Vishwaas Identifier</Label>
+              <form onSubmit={handleEmailAuth} className="space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8E8E93] ml-2">Vishwaas Identifier</Label>
                   <Input 
                     id="email" 
                     type="email" 
-                    placeholder="name@vishwaas.guard" 
-                    className="h-14 rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 px-6 focus:ring-primary/20"
+                    placeholder="identity@vishwaas.guard" 
+                    className="h-16 rounded-[24px] border-white/10 bg-white/5 text-white placeholder:text-white/20 px-8 focus:ring-primary/20 backdrop-blur-md"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-[#8E8E93] ml-1">Security Key</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8E8E93] ml-2">Security Key</Label>
                   <Input 
                     id="password" 
                     type="password" 
                     placeholder="••••••••" 
-                    className="h-14 rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 px-6 focus:ring-primary/20"
+                    className="h-16 rounded-[24px] border-white/10 bg-white/5 text-white placeholder:text-white/20 px-8 focus:ring-primary/20 backdrop-blur-md"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black gap-2 shadow-xl shadow-primary/20 mt-2" disabled={loading}>
-                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (isSignUp ? "Confirm Account" : "Verify Session")}
-                  {!loading && <ArrowRight className="h-4 w-4" />}
+                <Button type="submit" className="w-full h-16 rounded-[24px] bg-primary hover:bg-primary/90 text-white font-black gap-3 shadow-[0_12px_24px_rgba(0,102,255,0.4)] mt-4 active:scale-95" disabled={loading}>
+                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (isSignUp ? "Confirm Identity" : "Authenticate Session")}
+                  {!loading && <ArrowRight className="h-5 w-5" />}
                 </Button>
                 
-                <div className="text-center pt-2">
+                <div className="text-center pt-4">
                   <button 
                     type="button"
                     onClick={() => setIsSignUp(!isSignUp)}
-                    className="text-[10px] text-primary font-black uppercase tracking-widest hover:underline"
+                    className="text-[10px] text-primary font-black uppercase tracking-[0.3em] hover:opacity-80 transition-opacity"
                   >
-                    {isSignUp ? "Already Enrolled? Sign In" : "Request New Security ID"}
+                    {isSignUp ? "Existing Identity? Access Perimeter" : "Request New Security ID"}
                   </button>
                 </div>
 
@@ -179,9 +185,9 @@ export function AuthScreen() {
           </CardContent>
         </Card>
 
-        <div className="flex justify-center items-center gap-2 opacity-60">
-          <Lock className="h-3 w-3 text-primary" />
-          <p className="text-center text-[9px] text-[#8E8E93] font-black uppercase tracking-[0.3em]">
+        <div className="flex justify-center items-center gap-3 opacity-60">
+          <Lock className="h-4 w-4 text-primary" />
+          <p className="text-center text-[10px] text-[#8E8E93] font-black uppercase tracking-[0.4em]">
             Zero-Knowledge Sessions Active
           </p>
         </div>
