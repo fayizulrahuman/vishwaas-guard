@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from 'react'
-import { Shield, ShieldAlert, ShieldCheck, Eye, EyeOff, Camera, Mic, PhoneOff, AlertTriangle, Fingerprint } from 'lucide-react'
+import { Shield, ShieldAlert, ShieldCheck, Eye, EyeOff, Camera, Mic, PhoneOff, AlertTriangle, Fingerprint, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
@@ -18,6 +18,7 @@ export function ShieldOverlay() {
   const [status, setStatus] = useState<'idle' | 'secure' | 'warning' | 'critical'>('idle')
   const [analysisText, setAnalysisText] = useState('Standby for biometric scan...')
   const [isCameraOff, setIsCameraOff] = useState(false)
+  const [isActivating, setIsActivating] = useState(false)
   
   const scanInterval = useRef<NodeJS.Timeout | null>(null)
 
@@ -66,29 +67,8 @@ export function ShieldOverlay() {
   }, [])
 
   return (
-    <div className="relative w-full overflow-hidden rounded-[20px] bg-black aspect-video group/shield">
-      {!privacyConsent && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-3xl p-12 text-center">
-          <div className="max-w-md space-y-8 animate-in fade-in zoom-in-95 duration-700">
-            <div className="relative h-24 w-24 mx-auto">
-              <div className="absolute inset-0 metallic-ring animate-spin-slow"></div>
-              <div className="absolute inset-1 glass-panel rounded-full flex items-center justify-center">
-                <Fingerprint className="h-10 w-10 text-primary" />
-              </div>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-3xl font-black text-white tracking-tighter">Biometric Entry</h3>
-              <p className="text-[#8E8E93] text-lg font-medium leading-relaxed">
-                Unlock the security layer by granting real-time biometric access. Data remains strictly on-device.
-              </p>
-            </div>
-            <Button onClick={() => setPrivacyConsent(true)} className="w-full h-14 rounded-[20px] bg-white text-black font-black text-lg">
-              Unlock Glass Filter
-            </Button>
-          </div>
-        </div>
-      )}
-
+    <div className="relative w-full overflow-hidden rounded-[32px] bg-black aspect-video group/shield border border-white/5">
+      {/* Background Feed (Visible under glass) */}
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
         {isCameraOff ? (
           <div className="w-full h-full bg-zinc-950 flex flex-col items-center justify-center gap-4 text-zinc-800">
@@ -100,16 +80,52 @@ export function ShieldOverlay() {
             <img 
               src="https://picsum.photos/seed/vishwaas-call/1920/1080" 
               alt="Call Feed" 
-              className="object-cover w-full h-full opacity-40 grayscale-[0.2]"
+              className="object-cover w-full h-full opacity-30 grayscale-[0.2]"
             />
             {isActive && <div className="scanline"></div>}
           </>
         )}
       </div>
 
+      {!privacyConsent && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[30px] p-6 text-center animate-in fade-in duration-1000">
+          <div className="max-w-md w-full space-y-10 animate-in fade-in zoom-in-95 duration-700">
+            <div className="relative h-28 w-28 mx-auto flex items-center justify-center">
+              <div className="absolute inset-0 metallic-ring animate-spin-slow opacity-60"></div>
+              <div className="h-20 w-20 rounded-full glass-panel flex items-center justify-center border-white/20 shadow-2xl">
+                <Fingerprint className="h-10 w-10 text-primary" />
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h3 className="text-4xl font-black text-white tracking-tighter uppercase">Biometric Entry</h3>
+              <p className="text-[#8E8E93] text-lg font-medium leading-relaxed max-w-sm mx-auto">
+                Unlock the security layer by granting real-time biometric access. Data remains strictly on-device.
+              </p>
+            </div>
+
+            <Button 
+              onClick={() => {
+                setIsActivating(true);
+                setTimeout(() => {
+                  setPrivacyConsent(true);
+                  setIsActivating(false);
+                }, 1000);
+              }} 
+              disabled={isActivating}
+              className="w-full h-16 rounded-[24px] bg-white text-black hover:bg-white/90 font-black text-xl shadow-2xl transition-all active:scale-95"
+            >
+              {isActivating ? <Loader2 className="h-6 w-6 animate-spin" /> : "Unlock Glass Filter"}
+            </Button>
+            
+            <p className="text-[10px] text-[#8E8E93] font-black uppercase tracking-[0.3em]">Hardware-level encryption enabled</p>
+          </div>
+        </div>
+      )}
+
       <div className="absolute inset-0 p-10 flex flex-col justify-between pointer-events-none">
         <div className="flex justify-between items-start">
-          <Badge variant={isActive ? "default" : "outline"} className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] ${isActive ? 'bg-primary text-white border-none' : 'bg-black/40 text-white/60 border-white/10 backdrop-blur-md'}`}>
+          <Badge variant={isActive ? "default" : "outline"} className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-full ${isActive ? 'bg-primary text-white border-none' : 'bg-black/40 text-white/60 border-white/10 backdrop-blur-md'}`}>
             {isActive ? <Eye className="h-3 w-3 mr-2" /> : <EyeOff className="h-3 w-3 mr-2" />}
             {isActive ? "Filter On" : "Filter Ready"}
           </Badge>
@@ -126,7 +142,7 @@ export function ShieldOverlay() {
 
         {isActive ? (
           <div className="flex flex-col md:flex-row justify-between items-end gap-8 animate-in slide-in-from-bottom-8 duration-700">
-            <div className="glass-panel p-8 max-w-sm pointer-events-auto">
+            <div className="glass-panel p-8 max-w-sm pointer-events-auto border-white/20">
               <div className="flex items-center gap-4 mb-4">
                 <div className={`p-3 rounded-xl ${status === 'critical' ? 'bg-destructive/20 text-destructive' : 'bg-primary/20 text-primary'}`}>
                   {status === 'secure' ? <ShieldCheck className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6" />}
