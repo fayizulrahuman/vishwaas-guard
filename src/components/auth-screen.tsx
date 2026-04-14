@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, Mail, ArrowRight, Loader2, Lock, Sparkles, UserPlus, Fingerprint } from 'lucide-react';
+import { Shield, Mail, ArrowRight, Loader2, Lock, Sparkles, UserPlus, Fingerprint, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -47,23 +47,27 @@ export function AuthScreen() {
         toast({ title: "Identity Created", description: "Your secure session is now active." });
       } else {
         await initiateEmailSignIn(auth, email, password);
+        toast({ title: "Access Granted", description: "Identity verified. Entering perimeter." });
       }
     } catch (error: any) {
-      console.error('Auth Error:', error.code, error.message);
       let description = "Please check your credentials and try again.";
       
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
         description = isSignUp 
-          ? "Creation failed. Use a valid email and strong security key." 
-          : "Verification failed. If you haven't registered, click 'REQUEST NEW SECURITY ID' below.";
+          ? "Identity creation failed. Use a valid email and strong security key." 
+          : "Verification failed. If you haven't registered this email, click 'REQUEST NEW IDENTITY' below.";
       } else if (error.code === 'auth/email-already-in-use') {
-        description = "This identity is already registered. Try signing in instead.";
+        description = "This identity is already registered. Switching to Sign In mode.";
         setIsSignUp(false);
       } else if (error.code === 'auth/weak-password') {
         description = "Security key must be at least 6 characters.";
       }
       
-      toast({ title: "Verification Error", description, variant: "destructive" });
+      toast({ 
+        title: "Verification Error", 
+        description, 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }
@@ -71,43 +75,44 @@ export function AuthScreen() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black p-4 relative overflow-hidden">
+      {/* Volumetric Background Spheres */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="bg-sphere sphere-blue -top-40 -left-40 animate-float opacity-40"></div>
         <div className="bg-sphere sphere-blue top-1/3 -right-20 animate-float opacity-20"></div>
         <div className="bg-sphere sphere-orange -bottom-60 left-1/2 -translate-x-1/2 opacity-20 animate-float"></div>
       </div>
       
-      <div className="relative z-10 w-full max-w-[460px] space-y-12">
-        <div className="text-center space-y-6">
+      <div className="relative z-10 w-full max-w-[460px] space-y-10">
+        <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="relative h-24 w-24 rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl backdrop-blur-xl group">
+            <div className="relative h-20 w-20 md:h-24 md:w-24 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl backdrop-blur-xl group">
               <div className="absolute inset-0 metallic-ring opacity-40 group-hover:opacity-70 transition-opacity"></div>
-              <Shield className="h-12 w-12 text-primary relative z-10 drop-shadow-[0_0_15px_rgba(0,102,255,0.6)]" />
+              <Shield className="h-10 w-10 md:h-12 md:w-12 text-primary relative z-10 drop-shadow-[0_0_15px_rgba(0,102,255,0.6)]" />
             </div>
           </div>
-          <div className="space-y-2">
-            <h1 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">Vishwaas Guard</h1>
-            <p className="text-[#8E8E93] text-[10px] font-black uppercase tracking-[0.4em]">Integrity. Filtered by Glass.</p>
+          <div className="space-y-1">
+            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase leading-none">Vishwaas Guard</h1>
+            <p className="text-[#8E8E93] text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em]">Integrity. Filtered by Glass.</p>
           </div>
         </div>
 
-        <Card className="frosted-glass border-white/10 shadow-2xl rounded-[3rem] overflow-hidden bg-black/40 backdrop-blur-[60px]">
-          <CardHeader className="pt-12 pb-8">
-            <CardTitle className="text-2xl text-center text-white font-black tracking-tight flex items-center justify-center gap-2">
+        <Card className="frosted-glass border-white/10 shadow-2xl rounded-[2.5rem] md:rounded-[3rem] overflow-hidden bg-black/40 backdrop-blur-[60px]">
+          <CardHeader className="pt-10 pb-6 md:pt-12 md:pb-8">
+            <CardTitle className="text-xl md:text-2xl text-center text-white font-black tracking-tight flex items-center justify-center gap-2">
               {isSignUp ? <UserPlus className="h-5 w-5 text-primary" /> : <Lock className="h-5 w-5 text-primary" />}
               {method === 'options' ? "Secure Entry" : (isSignUp ? "Create Identity" : "Access Perimeter")}
             </CardTitle>
-            <CardDescription className="text-center text-[#8E8E93] font-medium px-4 text-sm mt-2">
-              {isSignUp ? "Define your new encrypted identity." : "Choose your cryptographic verification method."}
+            <CardDescription className="text-center text-[#8E8E93] font-medium px-4 text-xs md:text-sm mt-2">
+              {isSignUp ? "Define your new encrypted biometric identity." : "Verify your cryptographic identity for entry."}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 pb-12">
+          <CardContent className="space-y-4 pb-10 md:pb-12">
             {method === 'options' ? (
               <div className="space-y-4">
                 <Button 
                   onClick={handleGoogleLogin} 
                   variant="outline" 
-                  className="w-full h-16 rounded-[24px] font-bold border-white/10 bg-white/5 hover:bg-white/10 text-white gap-4 active:scale-95 transition-all"
+                  className="w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] font-bold border-white/10 bg-white/5 hover:bg-white/10 text-white gap-4 active:scale-95 transition-all"
                   disabled={loading}
                 >
                   <GoogleIcon className="h-5 w-5" />
@@ -117,72 +122,79 @@ export function AuthScreen() {
                 <Button 
                   onClick={() => setMethod('email')}
                   variant="outline" 
-                  className="w-full h-16 rounded-[24px] font-bold border-white/10 bg-white/5 hover:bg-white/10 text-white gap-4 active:scale-95 transition-all"
+                  className="w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] font-bold border-white/10 bg-white/5 hover:bg-white/10 text-white gap-4 active:scale-95 transition-all"
                   disabled={loading}
                 >
                   <Mail className="h-5 w-5 text-[#8E8E93]" />
                   Continue with Email
                 </Button>
 
-                <div className="relative py-8">
+                <div className="relative py-6">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-white/5"></span>
                   </div>
-                  <div className="relative flex justify-center text-[9px] uppercase">
-                    <span className="bg-black/20 backdrop-blur-xl px-4 text-[#8E8E93] font-black tracking-[0.3em] rounded-full py-1">Secure Protocol</span>
+                  <div className="relative flex justify-center text-[8px] md:text-[9px] uppercase">
+                    <span className="bg-black/20 backdrop-blur-xl px-4 text-[#8E8E93] font-black tracking-[0.3em] rounded-full py-1">Instant Access Protocol</span>
                   </div>
                 </div>
 
                 <Button 
                   onClick={async () => {
                     setLoading(true);
-                    try { await initiateAnonymousSignIn(auth); } 
-                    catch { toast({ title: "Error", variant: "destructive" }); } 
+                    try { 
+                      await initiateAnonymousSignIn(auth); 
+                      toast({ title: "Anonymous Session Active", description: "Entering perimeter as a guest peer." });
+                    } 
+                    catch { toast({ title: "Entry Error", variant: "destructive" }); } 
                     finally { setLoading(false); }
                   }}
-                  variant="ghost" 
-                  className="w-full h-14 rounded-[20px] font-black text-[#8E8E93] hover:text-white uppercase tracking-[0.3em] text-[10px]"
+                  className="w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] bg-primary/20 text-primary border border-primary/20 hover:bg-primary/30 font-black uppercase tracking-[0.2em] text-[10px] md:text-[11px] shadow-[0_0_20px_rgba(0,102,255,0.2)] active:scale-95 transition-all"
                   disabled={loading}
                 >
-                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Access as Anonymous Peer"}
+                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Sparkles className="h-4 w-4 mr-2" /> Access as Anonymous Peer</>}
                 </Button>
               </div>
             ) : (
-              <form onSubmit={handleEmailAuth} className="space-y-6">
-                <div className="space-y-3">
-                  <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8E8E93] ml-2">Identifier</Label>
+              <form onSubmit={handleEmailAuth} className="space-y-5 md:space-y-6">
+                <div className="space-y-2 md:space-y-3">
+                  <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-[#8E8E93] ml-2">Identity Identifier</Label>
                   <Input 
                     type="email" 
-                    placeholder="identity@vishwaas.guard" 
-                    className="h-16 rounded-[24px] border-white/10 bg-white/5 text-white px-8 focus:ring-primary/20 backdrop-blur-md"
+                    placeholder="name@vishwaas.guard" 
+                    className="h-14 md:h-16 rounded-[20px] md:rounded-[24px] border-white/10 bg-white/5 text-white px-6 md:px-8 focus:ring-primary/20 backdrop-blur-md"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
-                <div className="space-y-3">
-                  <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8E8E93] ml-2">Security Key</Label>
+                <div className="space-y-2 md:space-y-3">
+                  <Label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-[#8E8E93] ml-2">Security Token</Label>
                   <Input 
                     type="password" 
                     placeholder="••••••••" 
-                    className="h-16 rounded-[24px] border-white/10 bg-white/5 text-white px-8 focus:ring-primary/20 backdrop-blur-md"
+                    className="h-14 md:h-16 rounded-[20px] md:rounded-[24px] border-white/10 bg-white/5 text-white px-6 md:px-8 focus:ring-primary/20 backdrop-blur-md"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full h-16 rounded-[24px] bg-primary hover:bg-primary/90 text-white font-black gap-3 shadow-lg active:scale-95" disabled={loading}>
-                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (isSignUp ? "Confirm Identity" : "Authenticate Session")}
+                <Button type="submit" className="w-full h-14 md:h-16 rounded-[20px] md:rounded-[24px] bg-primary hover:bg-primary/90 text-white font-black gap-3 shadow-lg active:scale-95 transition-all" disabled={loading}>
+                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (isSignUp ? "Initialize Identity" : "Authorize Session")}
                   {!loading && <ArrowRight className="h-5 w-5" />}
                 </Button>
                 
-                <div className="flex flex-col items-center gap-4 pt-4">
+                <div className="flex flex-col items-center gap-4 pt-4 md:pt-6">
+                  <div className="p-3 rounded-xl bg-white/5 border border-white/5 text-[10px] text-[#8E8E93] font-medium flex gap-2 items-start max-w-[280px]">
+                    <Info className="h-3 w-3 mt-0.5 text-primary shrink-0" />
+                    <p>{isSignUp ? "Already have an identity? Switch to access mode below." : "New to the platform? Click 'REQUEST NEW IDENTITY' to register your email."}</p>
+                  </div>
+                  
                   <button 
                     type="button"
                     onClick={() => setIsSignUp(!isSignUp)}
-                    className="text-[11px] font-black uppercase tracking-[0.3em] transition-all py-2 border-b-2 text-primary border-primary hover:opacity-80"
+                    className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] transition-all py-1.5 border-b-2 text-primary border-primary hover:opacity-80"
                   >
-                    {isSignUp ? "Existing Identity? Access" : "Request New Security ID"}
+                    {isSignUp ? "Existing Identity? Access" : "Request New Identity"}
                   </button>
                   <Button variant="ghost" onClick={() => setMethod('options')} className="text-[#8E8E93] hover:text-white font-bold h-10 text-xs" disabled={loading}>
                     Return to Options
@@ -195,8 +207,8 @@ export function AuthScreen() {
 
         <div className="flex justify-center items-center gap-3 opacity-60">
           <Fingerprint className="h-4 w-4 text-primary" />
-          <p className="text-[10px] text-[#8E8E93] font-black uppercase tracking-[0.4em]">
-            Biometric Integrity Enabled
+          <p className="text-[9px] md:text-[10px] text-[#8E8E93] font-black uppercase tracking-[0.4em]">
+            Hardware Biometrics Enabled
           </p>
         </div>
       </div>

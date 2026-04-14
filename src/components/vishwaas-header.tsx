@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react"
-import { Shield, Bell, User, LogOut, Settings, Vault, Fingerprint, TrendingUp, FileAudio, FileVideo } from "lucide-react"
+import { Shield, Bell, User, LogOut, Settings, Vault, Fingerprint, TrendingUp, FileAudio, FileVideo, Mic } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { 
@@ -42,9 +42,9 @@ const MOCK_CHART_DATA = [
 ];
 
 const VAULT_ITEMS = [
-  { id: 1, type: 'audio', name: 'Voice Mimicry Detected', date: 'Oct 12', size: '1.2MB' },
-  { id: 2, type: 'video', name: 'Suspicious Zoom Feed', date: 'Oct 10', size: '24.8MB' },
-  { id: 3, type: 'audio', name: 'Bank Fraud Attempt', date: 'Oct 08', size: '0.9MB' },
+  { id: 1, type: 'audio', name: 'Voice Mimicry Intercept', date: 'Oct 12', size: '1.2MB' },
+  { id: 2, type: 'video', name: 'Deepfake Zoom Feed', date: 'Oct 10', size: '24.8MB' },
+  { id: 3, type: 'audio', name: 'Identity Hijack Attempt', date: 'Oct 08', size: '0.9MB' },
 ];
 
 export function VishwaasHeader() {
@@ -59,11 +59,11 @@ export function VishwaasHeader() {
   const [faceIdCheck, setFaceIdCheck] = useState(false);
 
   const handleSignOut = () => {
-    toast({ title: "Secure Wipe Initiated", description: "Clearing local cache and buffers..." });
+    toast({ title: "Secure Wipe Initiated", description: "Clearing session buffers..." });
     setTimeout(() => {
       signOut(auth);
-      toast({ title: "Session Purged", description: "Your biometric session has been decommissioned." });
-    }, 1000);
+      toast({ title: "Session Decommissioned", description: "Securely logged out." });
+    }, 800);
   };
 
   return (
@@ -80,9 +80,9 @@ export function VishwaasHeader() {
           </div>
         </div>
         
-        <div className="flex items-center gap-4 md:gap-8">
+        <div className="flex items-center gap-3 md:gap-6">
           <Button 
-            onClick={() => toast({ title: "Perimeter Check", description: "Monitoring active streams. Status: Secure." })} 
+            onClick={() => toast({ title: "Monitoring Active", description: "Perimeter status: Secure." })} 
             variant="ghost" 
             size="icon" 
             className="relative h-10 w-10 md:h-12 md:w-12 rounded-full hover:bg-white/10 transition-all active:scale-95"
@@ -95,7 +95,7 @@ export function VishwaasHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 md:h-12 md:w-12 rounded-full border border-white/20 p-0 hover:ring-2 hover:ring-primary/40 transition-all active:scale-95">
                 <Avatar className="h-full w-full">
-                  <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/100/100`} />
+                  <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid || 'guest'}/100/100`} />
                   <AvatarFallback className="bg-white/5 text-white"><User className="h-5 w-5 md:h-6 md:w-6" /></AvatarFallback>
                 </Avatar>
               </Button>
@@ -103,7 +103,7 @@ export function VishwaasHeader() {
             <DropdownMenuContent className="w-72 md:w-80 frosted-glass p-3 mt-4 md:mt-6 animate-in fade-in slide-in-from-top-6 duration-500 border-white/20 shadow-[0_32px_64px_rgba(0,0,0,0.6)]" align="end">
               <DropdownMenuLabel className="px-5 py-6 text-white">
                 <div className="space-y-2">
-                  <p className="text-base font-bold leading-none truncate">{user?.displayName || "Security Member"}</p>
+                  <p className="text-base font-bold leading-none truncate">{user?.displayName || (user?.isAnonymous ? "Guest Peer" : "Member")}</p>
                   <div className="flex items-center gap-3">
                     <div className="glow-dot scale-125"></div>
                     <p className="active-protection-glow text-[9px] md:text-[10px] uppercase tracking-[0.3em]">
@@ -146,15 +146,15 @@ export function VishwaasHeader() {
               <Fingerprint className="h-8 w-8 text-primary" />
               Biometric Filter
             </DialogTitle>
-            <DialogDescription className="text-[#8E8E93] font-medium text-sm md:text-lg">Manage identity protection.</DialogDescription>
+            <DialogDescription className="text-[#8E8E93] font-medium text-sm md:text-lg">Manage identity protection settings.</DialogDescription>
           </DialogHeader>
           <div className="space-y-6 mt-10">
             <div className="flex items-center justify-between p-8 rounded-[32px] bg-white/5 border border-white/10">
-              <Label className="text-lg font-bold text-white">Voice Print</Label>
+              <Label className="text-lg font-bold text-white">Voice Print Monitoring</Label>
               <Switch checked={voiceEnrollment} onCheckedChange={setVoiceEnrollment} />
             </div>
             <div className="flex items-center justify-between p-8 rounded-[32px] bg-white/5 border border-white/10">
-              <Label className="text-lg font-bold text-white">Face ID Scan</Label>
+              <Label className="text-lg font-bold text-white">Live Face ID Check</Label>
               <Switch checked={faceIdCheck} onCheckedChange={setFaceIdCheck} />
             </div>
           </div>
@@ -168,13 +168,16 @@ export function VishwaasHeader() {
               <Vault className="h-8 w-8 text-primary" />
               Evidence Gallery
             </DialogTitle>
-            <DialogDescription className="text-[#8E8E93]">Encrypted deepfake evidence.</DialogDescription>
+            <DialogDescription className="text-[#8E8E93]">Encrypted storage for detected deepfake evidence.</DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 mt-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
             {VAULT_ITEMS.map((item) => (
-              <div key={item.id} className="frosted-glass p-8 flex flex-col items-center justify-center gap-6 border-white/10 hover:bg-white/10 transition-all">
+              <div key={item.id} className="frosted-glass p-6 md:p-8 flex flex-col items-center justify-center gap-6 border-white/10 hover:bg-white/10 transition-all cursor-default">
                 {item.type === 'audio' ? <FileAudio className="h-10 w-10 text-primary" /> : <FileVideo className="h-10 w-10 text-primary" />}
-                <p className="text-sm font-black text-white text-center">{item.name}</p>
+                <div className="text-center">
+                  <p className="text-sm font-black text-white">{item.name}</p>
+                  <p className="text-[10px] text-[#8E8E93] font-medium mt-1 uppercase tracking-wider">{item.date} • {item.size}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -188,8 +191,9 @@ export function VishwaasHeader() {
               <TrendingUp className="h-8 w-8 text-primary" />
               Intelligence Analysis
             </DialogTitle>
+            <DialogDescription className="text-[#8E8E93]">Visual breakdown of intercepted biometric threats over time.</DialogDescription>
           </DialogHeader>
-          <div className="h-[300px] md:h-[450px] w-full mt-16 p-8 bg-black/40 rounded-[40px] border border-white/10">
+          <div className="h-[300px] md:h-[450px] w-full mt-12 p-6 md:p-10 bg-black/40 rounded-[32px] md:rounded-[48px] border border-white/10">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={MOCK_CHART_DATA}>
                 <defs>
@@ -201,7 +205,15 @@ export function VishwaasHeader() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff08" />
                 <XAxis dataKey="day" stroke="#8E8E93" fontSize={10} axisLine={false} tickLine={false} />
                 <YAxis stroke="#8E8E93" fontSize={10} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: 'rgba(0,0,0,0.8)', border: 'none', borderRadius: '16px', color: '#fff' }} />
+                <Tooltip 
+                  contentStyle={{ 
+                    background: 'rgba(0,0,0,0.8)', 
+                    border: '1px solid rgba(255,255,255,0.1)', 
+                    borderRadius: '16px', 
+                    color: '#fff',
+                    backdropBlur: '12px'
+                  }} 
+                />
                 <Area type="monotone" dataKey="frequency" stroke="#0066FF" strokeWidth={3} fillOpacity={1} fill="url(#colorFreq)" />
               </AreaChart>
             </ResponsiveContainer>
