@@ -28,7 +28,7 @@ export function AuthScreen() {
     } catch (error: any) {
       let description = error.message;
       if (error.code === 'auth/popup-blocked') {
-        description = "Your browser blocked the login popup. Please allow popups for this site or try Email login.";
+        description = "Authentication popup blocked. Please allow popups for this site in your browser settings or try using Email login.";
       }
       toast({
         title: "Login Failed",
