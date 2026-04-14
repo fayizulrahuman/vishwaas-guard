@@ -59,13 +59,13 @@ export function VishwaasHeader() {
   const [faceIdCheck, setFaceIdCheck] = useState(false);
 
   const handleSignOut = () => {
-    toast({ title: "Secure Wipe Initiated", description: "Clearing local cache and AI inference buffers..." });
+    toast({ title: "Secure Wipe Initiated", description: "Clearing local cache and buffers..." });
     setTimeout(() => {
       localStorage.clear();
       sessionStorage.clear();
       signOut(auth);
       toast({ title: "Session Purged", description: "Your biometric session has been decommissioned." });
-    }, 1500);
+    }, 1000);
   };
 
   return (
@@ -84,7 +84,7 @@ export function VishwaasHeader() {
         
         <div className="flex items-center gap-4 md:gap-8">
           <Button 
-            onClick={() => toast({ title: "Perimeter Check", description: "Monitoring 4 active streams. Status: Secure." })} 
+            onClick={() => toast({ title: "Perimeter Check", description: "Monitoring active streams. Status: Secure." })} 
             variant="ghost" 
             size="icon" 
             className="relative h-10 w-10 md:h-12 md:w-12 rounded-full hover:bg-white/10 transition-all active:scale-95"
@@ -103,8 +103,6 @@ export function VishwaasHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-72 md:w-80 frosted-glass p-3 mt-4 md:mt-6 animate-in fade-in slide-in-from-top-6 duration-500 border-white/20 shadow-[0_32px_64px_rgba(0,0,0,0.6)]" align="end">
-              <div className="absolute -top-6 -left-6 h-14 w-14 metallic-ring opacity-30"></div>
-              
               <DropdownMenuLabel className="px-5 py-6 text-white">
                 <div className="space-y-2">
                   <p className="text-base font-bold leading-none truncate">{user?.displayName || "Security Member"}</p>
@@ -144,64 +142,41 @@ export function VishwaasHeader() {
       </div>
 
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
-        <DialogContent className="frosted-glass w-[92vw] sm:max-w-lg p-6 md:p-12 border-white/30 shadow-[0_0_100px_rgba(0,102,255,0.2)] overflow-hidden">
-          <div className="absolute -bottom-24 -right-24 h-48 w-48 metallic-ring opacity-20 rotate-45 pointer-events-none"></div>
-          <DialogHeader className="space-y-3 md:space-y-4 text-left">
-            <DialogTitle className="text-xl md:text-3xl font-black text-white flex items-center gap-3 md:gap-4">
-              <Fingerprint className="h-6 w-6 md:h-8 md:w-8 text-primary drop-shadow-[0_0_8px_rgba(0,102,255,0.8)]" />
+        <DialogContent className="frosted-glass w-[92vw] sm:max-w-lg p-6 md:p-12 border-white/30 shadow-[0_0_100px_rgba(0,102,255,0.2)]">
+          <DialogHeader className="space-y-3 text-left">
+            <DialogTitle className="text-xl md:text-3xl font-black text-white flex items-center gap-4">
+              <Fingerprint className="h-8 w-8 text-primary" />
               Biometric Filter
             </DialogTitle>
-            <DialogDescription className="text-[#8E8E93] font-medium text-sm md:text-lg leading-relaxed">Manage your hardware-level identity protection.</DialogDescription>
+            <DialogDescription className="text-[#8E8E93] font-medium text-sm md:text-lg">Manage identity protection.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-6 md:space-y-10 mt-6 md:mt-10">
-            <div className="space-y-4 md:space-y-6">
-              <div className="flex items-center justify-between p-5 md:p-8 rounded-[24px] md:rounded-[32px] bg-white/5 border border-white/10 backdrop-blur-3xl shadow-inner">
-                <div className="space-y-0.5">
-                  <Label className="text-sm md:text-lg font-bold text-white">Voice Print</Label>
-                  <p className="text-[9px] md:text-xs text-[#8E8E93] tracking-tight">Vocal resonance monitoring.</p>
-                </div>
-                <Switch checked={voiceEnrollment} onCheckedChange={setVoiceEnrollment} className="data-[state=checked]:bg-[#DFFF00]" />
-              </div>
-              <div className="flex items-center justify-between p-5 md:p-8 rounded-[24px] md:rounded-[32px] bg-white/5 border border-white/10 backdrop-blur-3xl shadow-inner">
-                <div className="space-y-0.5">
-                  <Label className="text-sm md:text-lg font-bold text-white">Face ID Scan</Label>
-                  <p className="text-[9px] md:text-xs text-[#8E8E93] tracking-tight">Geometric volumetric scan.</p>
-                </div>
-                <Switch checked={faceIdCheck} onCheckedChange={setFaceIdCheck} className="data-[state=checked]:bg-[#DFFF00]" />
-              </div>
+          <div className="space-y-6 mt-10">
+            <div className="flex items-center justify-between p-8 rounded-[32px] bg-white/5 border border-white/10">
+              <Label className="text-lg font-bold text-white">Voice Print</Label>
+              <Switch checked={voiceEnrollment} onCheckedChange={setVoiceEnrollment} />
             </div>
-            <div className="grid grid-cols-2 gap-4 md:gap-6">
-              <Button variant="outline" className="h-12 md:h-16 rounded-[18px] md:rounded-[24px] bg-white/5 border-white/10 text-white font-black text-[9px] md:text-xs uppercase tracking-[0.2em] gap-2 md:gap-3 hover:bg-white/10 transition-all active:scale-95">
-                <Mic className="h-4 w-4 md:h-5 md:h-5" /> Retrain
-              </Button>
-              <Button variant="outline" className="h-12 md:h-16 rounded-[18px] md:rounded-[24px] bg-white/5 border-white/10 text-white font-black text-[9px] md:text-xs uppercase tracking-[0.2em] gap-2 md:gap-3 hover:bg-white/10 transition-all active:scale-95">
-                <ScanFace className="h-4 w-4 md:h-5 md:h-5" /> Reset
-              </Button>
+            <div className="flex items-center justify-between p-8 rounded-[32px] bg-white/5 border border-white/10">
+              <Label className="text-lg font-bold text-white">Face ID Scan</Label>
+              <Switch checked={faceIdCheck} onCheckedChange={setFaceIdCheck} />
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={vaultOpen} onOpenChange={setVaultOpen}>
-        <DialogContent className="frosted-glass w-[92vw] sm:max-w-2xl p-6 md:p-12 border-white/30 shadow-2xl overflow-hidden">
-          <div className="absolute top-10 left-10 h-80 w-80 sphere-blue opacity-10 pointer-events-none"></div>
-          <DialogHeader className="space-y-3 md:space-y-4 text-left">
-            <DialogTitle className="text-xl md:text-3xl font-black text-white flex items-center gap-3 md:gap-4">
-              <Vault className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+        <DialogContent className="frosted-glass w-[92vw] sm:max-w-2xl p-6 md:p-12 border-white/30">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-xl md:text-3xl font-black text-white flex items-center gap-4">
+              <Vault className="h-8 w-8 text-primary" />
               Evidence Gallery
             </DialogTitle>
-            <DialogDescription className="text-[#8E8E93] font-medium text-sm md:text-lg leading-relaxed">Encrypted storage for detected deepfake threats.</DialogDescription>
+            <DialogDescription className="text-[#8E8E93]">Encrypted deepfake evidence.</DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-8 mt-8 md:mt-12">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 mt-12">
             {VAULT_ITEMS.map((item) => (
-              <div key={item.id} className="group frosted-glass p-5 md:p-8 aspect-square flex flex-col items-center justify-center gap-4 md:gap-6 hover:bg-white/10 cursor-pointer transition-all active:scale-95 border-white/10 shadow-lg">
-                <div className="p-3 md:p-5 rounded-full bg-black/40 text-white/40 group-hover:text-primary transition-colors border border-white/5 shadow-inner">
-                  {item.type === 'audio' ? <FileAudio className="h-6 w-6 md:h-10 md:w-10" /> : <FileVideo className="h-6 w-6 md:h-10 md:w-10" />}
-                </div>
-                <div className="text-center space-y-0.5">
-                  <p className="text-[10px] md:text-sm font-black text-white line-clamp-1 tracking-tight">{item.name}</p>
-                  <p className="text-[8px] md:text-[10px] text-[#8E8E93] uppercase font-black tracking-[0.3em]">{item.size}</p>
-                </div>
+              <div key={item.id} className="frosted-glass p-8 flex flex-col items-center justify-center gap-6 border-white/10 hover:bg-white/10 transition-all">
+                {item.type === 'audio' ? <FileAudio className="h-10 w-10 text-primary" /> : <FileVideo className="h-10 w-10 text-primary" />}
+                <p className="text-sm font-black text-white text-center">{item.name}</p>
               </div>
             ))}
           </div>
@@ -209,15 +184,14 @@ export function VishwaasHeader() {
       </Dialog>
 
       <Dialog open={activityOpen} onOpenChange={setActivityOpen}>
-        <DialogContent className="frosted-glass w-[92vw] sm:max-w-4xl p-6 md:p-12 border-white/30 shadow-2xl overflow-hidden">
-          <DialogHeader className="space-y-3 md:space-y-4 text-left">
-            <DialogTitle className="text-xl md:text-3xl font-black text-white flex items-center gap-3 md:gap-4">
-              <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-primary" />
+        <DialogContent className="frosted-glass w-[92vw] sm:max-w-4xl p-6 md:p-12 border-white/30">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-xl md:text-3xl font-black text-white flex items-center gap-4">
+              <TrendingUp className="h-8 w-8 text-primary" />
               Intelligence Analysis
             </DialogTitle>
-            <DialogDescription className="text-[#8E8E93] font-medium text-sm md:text-lg leading-relaxed">Deepfake Attempt Frequency over 30 days.</DialogDescription>
           </DialogHeader>
-          <div className="h-[300px] md:h-[450px] w-full mt-8 md:mt-16 p-4 md:p-8 bg-black/40 rounded-[24px] md:rounded-[40px] border border-white/10 shadow-inner backdrop-blur-3xl">
+          <div className="h-[300px] md:h-[450px] w-full mt-16 p-8 bg-black/40 rounded-[40px] border border-white/10">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={MOCK_CHART_DATA}>
                 <defs>
@@ -227,19 +201,9 @@ export function VishwaasHeader() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff08" />
-                <XAxis dataKey="day" stroke="#8E8E93" fontSize={10} axisLine={false} tickLine={false} tickMargin={10} />
-                <YAxis stroke="#8E8E93" fontSize={10} axisLine={false} tickLine={false} tickMargin={10} />
-                <Tooltip 
-                  contentStyle={{ 
-                    background: 'rgba(0,0,0,0.85)', 
-                    border: '1px solid rgba(255,255,255,0.15)', 
-                    borderRadius: '24px', 
-                    color: '#fff',
-                    backdropFilter: 'blur(20px)',
-                    padding: '20px',
-                    boxShadow: '0 24px 48px rgba(0,0,0,0.5)'
-                  }} 
-                />
+                <XAxis dataKey="day" stroke="#8E8E93" fontSize={10} axisLine={false} tickLine={false} />
+                <YAxis stroke="#8E8E93" fontSize={10} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ background: 'rgba(0,0,0,0.8)', border: 'none', borderRadius: '16px', color: '#fff' }} />
                 <Area type="monotone" dataKey="frequency" stroke="#0066FF" strokeWidth={3} fillOpacity={1} fill="url(#colorFreq)" />
               </AreaChart>
             </ResponsiveContainer>
