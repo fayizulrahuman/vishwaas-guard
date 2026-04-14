@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react'
 import { Shield, ShieldAlert, ShieldCheck, Eye, EyeOff, Camera, Mic, PhoneOff, AlertTriangle, Fingerprint, Loader2 } from 'lucide-react'
@@ -81,6 +81,7 @@ export function ShieldOverlay() {
               src="https://picsum.photos/seed/vishwaas-call/1920/1080" 
               alt="Call Feed" 
               className="object-cover w-full h-full opacity-40 grayscale-[0.3]"
+              data-ai-hint="video call"
             />
             {isActive && <div className="scanline"></div>}
           </>
