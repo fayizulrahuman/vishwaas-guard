@@ -40,21 +40,38 @@ export function AuthScreen() {
     }
   };
 
-  const handleEmailAuth = (e: React.FormEvent) => {
+  const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
     setLoading(true);
     
-    if (isSignUp) {
-      initiateEmailSignUp(auth, email, password, () => setLoading(false));
-    } else {
-      initiateEmailSignIn(auth, email, password, () => setLoading(false));
+    try {
+      if (isSignUp) {
+        initiateEmailSignUp(auth, email, password);
+      } else {
+        initiateEmailSignIn(auth, email, password);
+      }
+    } catch (error: any) {
+      let description = "Please check your credentials and try again.";
+      if (error.code === 'auth/invalid-credential') {
+        description = "The identity identifier or security key provided is incorrect. Please verify your details.";
+      }
+      toast({
+        title: "Verification Error",
+        description,
+        variant: "destructive"
+      });
+    } finally {
+      // Note: In non-blocking login, auth state change handles the actual UI transition
+      // We set loading false here as a fallback or if using regular await pattern
+      setLoading(false);
     }
   };
 
   const handleGuestLogin = () => {
     setLoading(true);
-    initiateAnonymousSignIn(auth, () => setLoading(false));
+    initiateAnonymousSignIn(auth);
+    // Loading will be handled by auth state listener in the provider
   };
 
   return (
