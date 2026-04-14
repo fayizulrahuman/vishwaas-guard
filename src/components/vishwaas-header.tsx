@@ -143,7 +143,6 @@ export function VishwaasHeader() {
         </div>
       </div>
 
-      {/* Profile Modal */}
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
         <DialogContent className="frosted-glass w-[92vw] sm:max-w-lg p-6 md:p-12 border-white/30 shadow-[0_0_100px_rgba(0,102,255,0.2)] overflow-hidden">
           <div className="absolute -bottom-24 -right-24 h-48 w-48 metallic-ring opacity-20 rotate-45 pointer-events-none"></div>
@@ -183,7 +182,6 @@ export function VishwaasHeader() {
         </DialogContent>
       </Dialog>
 
-      {/* Vault Modal */}
       <Dialog open={vaultOpen} onOpenChange={setVaultOpen}>
         <DialogContent className="frosted-glass w-[92vw] sm:max-w-2xl p-6 md:p-12 border-white/30 shadow-2xl overflow-hidden">
           <div className="absolute top-10 left-10 h-80 w-80 sphere-blue opacity-10 pointer-events-none"></div>
@@ -210,7 +208,6 @@ export function VishwaasHeader() {
         </DialogContent>
       </Dialog>
 
-      {/* Activity Analysis Modal */}
       <Dialog open={activityOpen} onOpenChange={setActivityOpen}>
         <DialogContent className="frosted-glass w-[92vw] sm:max-w-4xl p-6 md:p-12 border-white/30 shadow-2xl overflow-hidden">
           <DialogHeader className="space-y-3 md:space-y-4 text-left">

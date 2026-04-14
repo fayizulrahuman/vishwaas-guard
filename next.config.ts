@@ -2,7 +2,6 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   output: 'export',
-  basePath: '/vishwaas-guard',
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -26,6 +25,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  trailingSlash: true,
   typescript: {
     ignoreBuildErrors: true,
   },
