@@ -50,10 +50,10 @@ export function AuthScreen() {
       }
     } catch (error: any) {
       let description = "Please check your credentials and try again.";
-      if (error.code === 'auth/invalid-credential') {
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
         description = isSignUp 
           ? "This identity may already exist. Try signing in." 
-          : "Credentials not found. Check your details or Request a New Security ID.";
+          : "Identity not found. If you are new, click 'Request New Security ID' below.";
       } else if (error.code === 'auth/email-already-in-use') {
         description = "This identity is already registered. Try signing in.";
       } else if (error.code === 'auth/weak-password') {
@@ -94,7 +94,7 @@ export function AuthScreen() {
               {method === 'options' ? "Secure Entry" : (isSignUp ? "Create Identity" : "Access Perimeter")}
             </CardTitle>
             <CardDescription className="text-center text-[#8E8E93] font-medium px-4 text-sm mt-2">
-              Choose your cryptographic verification method.
+              {isSignUp ? "Register your encrypted identity." : "Choose your cryptographic verification method."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pb-12">
@@ -175,8 +175,14 @@ export function AuthScreen() {
                 <div className="flex flex-col items-center gap-4 pt-4">
                   <button 
                     type="button"
-                    onClick={() => setIsSignUp(!isSignUp)}
-                    className="text-[10px] text-primary font-black uppercase tracking-[0.3em] hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      setIsSignUp(!isSignUp);
+                      toast({
+                        title: isSignUp ? "Switching to Access" : "Switching to Creation",
+                        description: isSignUp ? "Enter your existing credentials." : "Define your new security identity.",
+                      });
+                    }}
+                    className="text-[10px] text-primary font-black uppercase tracking-[0.3em] hover:opacity-80 transition-opacity py-2"
                   >
                     {isSignUp ? "Existing Identity? Access" : "Request New Security ID"}
                   </button>
