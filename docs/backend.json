@@ -4,179 +4,154 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "UserProfile",
       "type": "object",
-      "description": "Stores user-specific data, linked to their authentication ID, but excluding sensitive authentication credentials handled by Firebase Authentication. This includes user preferences and contact information.",
+      "description": "Represents a user's profile information, primarily to link user-specific data to their external authentication account (e.g., Firebase Authentication).",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the UserProfile entity. This typically corresponds to the Firebase Authentication user ID."
+          "description": "Unique identifier for the UserProfile entity."
         },
-        "displayName": {
+        "externalAuthId": {
           "type": "string",
-          "description": "The user's display name, as provided during registration or updated by the user."
-        },
-        "email": {
-          "type": "string",
-          "description": "The user's email address, used for communication and as a potential login method. (Relationship: UserProfile 1:1 Authentication)",
-          "format": "email"
-        },
-        "phoneNumber": {
-          "type": "string",
-          "description": "The user's phone number, used for communication and as a potential login method. (Relationship: UserProfile 1:1 Authentication)"
-        },
-        "photoUrl": {
-          "type": "string",
-          "description": "URL to the user's profile picture.",
-          "format": "uri"
-        },
-        "cameraConsent": {
-          "type": "boolean",
-          "description": "Indicates whether the user has given consent for camera access for real-time analysis features."
-        },
-        "audioAnalysisConsent": {
-          "type": "boolean",
-          "description": "Indicates whether the user has given consent for audio analysis from system calls."
+          "description": "The unique identifier provided by the external authentication system (e.g., Firebase Authentication User ID) for this user. (Relationship: External Auth 1:1 UserProfile)"
         },
         "createdAt": {
           "type": "string",
-          "description": "Timestamp when the user profile was created.",
+          "description": "Timestamp when the user profile was initially created.",
           "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
           "description": "Timestamp when the user profile was last updated.",
           "format": "date-time"
-        },
-        "lastLogin": {
-          "type": "string",
-          "description": "Timestamp of the user's last successful login.",
-          "format": "date-time"
         }
       },
       "required": [
         "id",
-        "displayName",
-        "cameraConsent",
-        "audioAnalysisConsent",
+        "externalAuthId",
         "createdAt",
-        "updatedAt",
-        "lastLogin"
+        "updatedAt"
       ]
     },
     "ScamSignature": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "ScamSignature",
       "type": "object",
-      "description": "Defines patterns or characteristics that identify potential scams or deepfakes. These signatures are used by the detection mechanisms.",
+      "description": "Stores characteristics and patterns used to identify known scams or deepfake techniques.",
       "properties": {
         "id": {
           "type": "string",
           "description": "Unique identifier for the ScamSignature entity."
         },
+        "name": {
+          "type": "string",
+          "description": "A human-readable name or title for the specific scam signature."
+        },
         "signatureType": {
           "type": "string",
-          "description": "The type of signature, e.g., 'audio_pattern', 'video_pattern', 'text_keyword', 'behavioral_anomaly'."
+          "description": "The type of media or context this signature applies to (e.g., 'audio', 'video', 'metadata', 'text')."
         },
-        "pattern": {
+        "patternDescription": {
           "type": "string",
-          "description": "The actual pattern or data used to identify a scam/deepfake (e.g., regex string, hash, specific metadata)."
-        },
-        "description": {
-          "type": "string",
-          "description": "A human-readable description of what this signature is designed to detect."
+          "description": "A detailed description of the pattern, characteristics, or model ID that this signature represents for detection."
         },
         "severity": {
           "type": "string",
-          "description": "The assessed severity level of the threat detected by this signature, e.g., 'low', 'medium', 'high', 'critical'."
+          "description": "The perceived severity level of a scam identified by this signature (e.g., 'Low', 'Medium', 'High', 'Critical')."
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Indicates whether this scam signature is currently active and being used for detection."
         },
         "createdAt": {
           "type": "string",
-          "description": "Timestamp when this scam signature was added to the system.",
+          "description": "Timestamp when the scam signature was added to the system.",
           "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
-          "description": "Timestamp when this scam signature was last updated.",
+          "description": "Timestamp when the scam signature was last updated.",
           "format": "date-time"
-        },
-        "isActive": {
-          "type": "boolean",
-          "description": "A flag indicating whether this scam signature is currently active and used for detection."
         }
       },
       "required": [
         "id",
+        "name",
         "signatureType",
-        "pattern",
-        "description",
+        "patternDescription",
         "severity",
+        "isActive",
         "createdAt",
-        "updatedAt",
-        "isActive"
+        "updatedAt"
       ]
     },
-    "DeepfakeAlert": {
+    "DeepfakeDetectionEvent": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "DeepfakeAlert",
+      "title": "DeepfakeDetectionEvent",
       "type": "object",
-      "description": "Records instances where a deepfake or suspicious activity has been detected, triggering an alert for a specific user.",
+      "description": "Records instances where media was analyzed for deepfake characteristics and the results of that analysis.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the DeepfakeAlert entity."
+          "description": "Unique identifier for the DeepfakeDetectionEvent entity."
         },
         "userId": {
           "type": "string",
-          "description": "Reference to the UserProfile for whom this alert was generated. (Relationship: UserProfile 1:N DeepfakeAlert)"
+          "description": "Reference to the UserProfile who was involved in or affected by this detection event. (Relationship: UserProfile 1:N DeepfakeDetectionEvent)"
         },
-        "detectedAt": {
+        "detectionTimestamp": {
           "type": "string",
-          "description": "Timestamp when the deepfake or suspicious activity was detected.",
+          "description": "Timestamp when the deepfake detection analysis was performed.",
           "format": "date-time"
         },
-        "alertType": {
+        "sourceMediaType": {
           "type": "string",
-          "description": "The specific type of alert, e.g., 'face_liveness_fail', 'audio_spoofing_detected', 'high_deepfake_probability', 'scam_signature_match'."
+          "description": "The type of media that was analyzed (e.g., 'audio', 'video', 'mixed')."
         },
-        "deepfakeProbability": {
+        "probabilityScore": {
           "type": "number",
-          "description": "The calculated probability (0-1) that the detected content is a deepfake, if applicable."
+          "description": "The calculated probability score (e.g., 0.0 to 1.0) indicating the likelihood of the media being a deepfake."
         },
-        "confidenceScore": {
-          "type": "number",
-          "description": "The confidence score (0-1) of the detection model in its assessment."
+        "isDeepfakeDetected": {
+          "type": "boolean",
+          "description": "Boolean flag indicating whether a deepfake was confirmed based on the probability score exceeding a predefined threshold."
         },
-        "triggeringScamSignatureIds": {
+        "analysisDetails": {
+          "type": "string",
+          "description": "Additional technical details or metadata from the deepfake analysis (e.g., specific features flagged, model version used, raw output)."
+        },
+        "matchedScamSignatureIds": {
           "type": "array",
-          "description": "References to ScamSignature entities that contributed to triggering this alert. (Relationship: ScamSignature N:N DeepfakeAlert)",
+          "description": "References to ScamSignature entities that were matched during this deepfake detection event. (Relationship: ScamSignature N:N DeepfakeDetectionEvent)",
           "items": {
             "type": "string"
           }
         },
-        "status": {
-          "type": "string",
-          "description": "The current status of the alert, e.g., 'new', 'viewed', 'dismissed', 'escalated'."
+        "isAlertTriggered": {
+          "type": "boolean",
+          "description": "Indicates whether an in-app alert was successfully triggered for this detection event."
         },
-        "associatedReportIds": {
-          "type": "array",
-          "description": "References to UserReport entities that mention or are related to this deepfake alert. (Relationship: DeepfakeAlert N:N UserReport)",
-          "items": {
-            "type": "string"
-          }
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when this deepfake detection event record was created.",
+          "format": "date-time"
         }
       },
       "required": [
         "id",
         "userId",
-        "detectedAt",
-        "alertType",
-        "status"
+        "detectionTimestamp",
+        "sourceMediaType",
+        "probabilityScore",
+        "isDeepfakeDetected",
+        "isAlertTriggered",
+        "createdAt"
       ]
     },
     "UserReport": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "UserReport",
       "type": "object",
-      "description": "Stores reports submitted by users regarding suspicious activities, potential scams, or deepfake encounters.",
+      "description": "Stores reports submitted by users regarding suspicious activities, deepfake encounters, or other security concerns.",
       "properties": {
         "id": {
           "type": "string",
@@ -188,34 +163,41 @@
         },
         "reportType": {
           "type": "string",
-          "description": "The category of the report, e.g., 'deepfake_suspect', 'scam_call', 'privacy_concern', 'false_positive_alert'."
+          "description": "The category or type of incident being reported (e.g., 'Deepfake Encounter', 'Scam Attempt', 'Suspicious Call')."
         },
         "description": {
           "type": "string",
-          "description": "A detailed, free-text description of the user's experience or observation."
+          "description": "The user's free-form description of the reported incident."
         },
-        "submittedAt": {
+        "incidentTimestamp": {
           "type": "string",
-          "description": "Timestamp when the user submitted this report.",
+          "description": "The timestamp when the reported incident occurred, as provided by the user.",
           "format": "date-time"
+        },
+        "deepfakeDetectionEventId": {
+          "type": "string",
+          "description": "Optional reference to a DeepfakeDetectionEvent if this report is directly related to a system-detected deepfake. (Relationship: DeepfakeDetectionEvent 1:N UserReport)"
         },
         "status": {
           "type": "string",
-          "description": "The current processing status of the report, e.g., 'pending', 'under_review', 'action_taken', 'closed'."
+          "description": "The current processing status of the report (e.g., 'Pending', 'Under Review', 'Resolved', 'Archived')."
         },
-        "deepfakeAlertIds": {
+        "attachmentUris": {
           "type": "array",
-          "description": "References to DeepfakeAlert entities that are mentioned or associated with this user report. (Relationship: UserReport N:N DeepfakeAlert)",
+          "description": "An array of URIs to external storage locations for any attachments (e.g., screenshots, recordings) provided by the user.",
           "items": {
             "type": "string"
           }
         },
-        "evidenceUrls": {
-          "type": "array",
-          "description": "URLs to any supporting evidence (e.g., screenshots, recorded audio snippets) securely stored externally.",
-          "items": {
-            "type": "string"
-          }
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user report was submitted.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the user report was last updated (e.g., status change).",
+          "format": "date-time"
         }
       },
       "required": [
@@ -223,8 +205,9 @@
         "userId",
         "reportType",
         "description",
-        "submittedAt",
-        "status"
+        "incidentTimestamp",
+        "status",
+        "createdAt"
       ]
     }
   },
@@ -237,57 +220,17 @@
   "firestore": {
     "structure": [
       {
-        "path": "/users/{userId}",
+        "path": "/userProfiles/{userId}",
         "definition": {
           "entityName": "UserProfile",
           "schema": {
             "$ref": "#/backend/entities/UserProfile"
           },
-          "description": "Stores individual user profile data. The document ID (`{userId}`) must match the `UserProfile.id` field and the Firebase Authentication UID (`request.auth.uid`). This provides a direct, path-based ownership for secure access.",
+          "description": "Stores individual user profile information. The `userId` wildcard corresponds to the Firebase Authentication UID. Access is restricted to the owner (`request.auth.uid`).",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier of the user, corresponding to Firebase Authentication UID."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/deepfakeAlerts/{alertId}",
-        "definition": {
-          "entityName": "DeepfakeAlert",
-          "schema": {
-            "$ref": "#/backend/entities/DeepfakeAlert"
-          },
-          "description": "Stores deepfake detection alerts specific to a user. The `DeepfakeAlert.userId` field is denormalized within each document to match the parent `{userId}` path parameter, ensuring Authorization Independence and simplifying security rules. This allows for secure querying of a user's alerts.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who received the alert, matching the parent path."
-            },
-            {
-              "name": "alertId",
-              "description": "The unique identifier for a specific deepfake alert."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/userReports/{reportId}",
-        "definition": {
-          "entityName": "UserReport",
-          "schema": {
-            "$ref": "#/backend/entities/UserReport"
-          },
-          "description": "Stores reports submitted by a specific user regarding suspicious activities. The `UserReport.userId` field is denormalized within each document to match the parent `{userId}` path parameter, ensuring Authorization Independence and simplifying security rules. This enables secure listing of a user's reports.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who submitted the report, matching the parent path."
-            },
-            {
-              "name": "reportId",
-              "description": "The unique identifier for a specific user report."
+              "description": "The unique identifier of the user, matching their Firebase Authentication UID."
             }
           ]
         }
@@ -299,7 +242,7 @@
           "schema": {
             "$ref": "#/backend/entities/ScamSignature"
           },
-          "description": "Stores global patterns and characteristics for identifying scams and deepfakes. This collection is primarily read-only for all authenticated users/system components for detection purposes, requiring no user-specific authorization denormalization for reads. Write access would be restricted to administrators via a separate role-based access control collection.",
+          "description": "Contains globally accessible characteristics and patterns for identifying scams and deepfakes. These documents are read-only for general users; creation and updates are managed by backend services or administrators.",
           "params": [
             {
               "name": "signatureId",
@@ -309,22 +252,46 @@
         }
       },
       {
-        "path": "/adminRoles/{adminId}",
+        "path": "/userProfiles/{userId}/deepfakeDetectionEvents/{eventId}",
         "definition": {
-          "entityName": "UserProfile",
+          "entityName": "DeepfakeDetectionEvent",
           "schema": {
-            "$ref": "#/backend/entities/UserProfile"
+            "$ref": "#/backend/entities/DeepfakeDetectionEvent"
           },
-          "description": "Stores documents representing users with administrative privileges. The document ID (`{adminId}`) corresponds to the Firebase Authentication UID of an administrator. This collection is used for Database Access Control (DBAC) to grant elevated permissions (e.g., to manage scam signatures) without using custom claims, leveraging the 'existence over content' principle. The schema is UserProfile as it conceptually ties to a user, though only the ID matters for role validation.",
+          "description": "Records instances of deepfake detection analysis associated with a specific user. Includes denormalized 'userId' field for authorization independence, ensuring `request.auth.uid` matches both the path wildcard and the document's 'userId'.",
           "params": [
             {
-              "name": "adminId",
-              "description": "The unique identifier of the administrator, corresponding to their Firebase Authentication UID."
+              "name": "userId",
+              "description": "The unique identifier of the user who owns this detection event, matching their Firebase Authentication UID."
+            },
+            {
+              "name": "eventId",
+              "description": "The unique identifier for a specific deepfake detection event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/userReports/{reportId}",
+        "definition": {
+          "entityName": "UserReport",
+          "schema": {
+            "$ref": "#/backend/entities/UserReport"
+          },
+          "description": "Stores reports submitted by users regarding suspicious activities or deepfake encounters. Includes denormalized 'userId' field for authorization independence, ensuring `request.auth.uid` matches both the path wildcard and the document's 'userId'.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who submitted this report, matching their Firebase Authentication UID."
+            },
+            {
+              "name": "reportId",
+              "description": "The unique identifier for a specific user report."
             }
           ]
         }
       }
     ],
-    "reasoning": "The proposed Firestore structure for Vishwaas Guard is meticulously designed to adhere to core Firebase security, scalability, and debuggability principles. The architecture prioritizes Authorization Independence, ensuring robust and simple security rules.\n\n**Authorization Independence (CRITICAL):**\n*   **User Profiles and Data (`/users/{userId}`, `/users/{userId}/deepfakeAlerts`, `/users/{userId}/userReports`):** For all user-specific data, the design mandates explicit denormalization of the `userId` within the document itself (e.g., `DeepfakeAlert.userId`, `UserReport.userId`). Furthermore, these user-specific collections are nested directly under `/users/{userId}`, where the `{userId}` wildcard matches the Firebase Authentication UID (`request.auth.uid`). This critical redundancy ensures that authorization decisions can be made directly on the requested document and its path, eliminating the need for `get()` calls in security rules to fetch parent documents. This supports atomic operations (transactions/batches) by allowing the creation of a user profile and related sub-documents within a single, secure write.\n*   **Global Data (`/scamSignatures`):** This collection is designed for read-only access by all authenticated users or system components. Since its access is not dependent on a specific user's attributes, no user-specific denormalization is required for reads. Write access, if needed for administration, is managed via a separate role-based collection (`/adminRoles`), which also avoids `get()` operations by checking for document existence.\n\n**QAPs (Rules are not Filters):**\n*   **User-Scoped Collections:** By structuring `deepfakeAlerts` and `userReports` as subcollections of `/users/{userId}`, queries and list operations are inherently scoped to the authenticated user. For example, a query to `/users/$(request.auth.uid)/deepfakeAlerts` will only ever return alerts belonging to the requesting user. The security rules will enforce `request.auth.uid == userId` for all read operations on these paths, guaranteeing that every document returned by a query satisfies the security conditions. This prevents rules from being used as implicit filters, ensuring only authorized data is retrieved efficiently.\n*   **Global Collections:** The `/scamSignatures` collection maintains a homogeneous security posture (read-only for all authenticated users). This allows any authenticated user to perform `list` operations without filtering by rules, as all documents in the collection are equally accessible for reading.\n\n**Structural Segregation & Clarity of Intent:**\n*   Each collection or subcollection serves a distinct purpose and has a uniform security posture, simplifying rule writing. For instance, `UserProfile` documents are strictly private to their owners, while `ScamSignatures` are globally readable. The semantic naming of paths (e.g., `{userId}`, `{alertId}`) makes the authorization intent immediately clear.\n\n**DBAC (No Custom Claims) & Invariants:**\n*   **Role-Based Access Control (`/adminRoles/{adminId}`):** Administrative privileges are granted via the presence of a document in the `/adminRoles` collection, where the document ID matches the administrator's UID. This "
+    "reasoning": "The Firestore structure is designed around core principles of Authorization Independence, Structural Segregation, and clear Access Modeling to ensure security, scalability, and debuggability. \n\n**Authorization Independence via Denormalization (Mandate A):**\nThis is achieved by storing the `userId` directly within `DeepfakeDetectionEvent` and `UserReport` documents, even though they are nested under `/userProfiles/{userId}`. For example, a `DeepfakeDetectionEvent` document at `/userProfiles/{someUserId}/deepfakeDetectionEvents/{eventId}` will explicitly contain `\"userId\": \"someUserId\"`. This denormalization means that security rules for these subcollections do not need to perform a `get()` operation on the parent `UserProfile` document to determine ownership. Instead, rules can directly compare `request.auth.uid` with the `{userId}` wildcard in the path and with the `resource.data.userId` field in the document itself. This eliminates costly and complex `get()` calls in rules, making operations atomic and highly debuggable.\n\n**Structural Segregation (Mandate B):**\nDocuments are segregated into collections based on their security posture. `ScamSignature` documents, intended for global read access by all users (for detection processes), reside in a top-level collection `/scamSignatures`. In contrast, `UserProfile` and its associated `DeepfakeDetectionEvent` and `UserReport` records, which are private and user-specific, are organized hierarchically under `/userProfiles/{userId}`. This ensures that all documents within a given collection or subcollection share the same access requirements, simplifying rule logic significantly.\n\n**Access Modeling (Mandate C) and QAPs (Rules are not Filters):**\n1.  **Private Data:** `UserProfile` documents are stored at `/userProfiles/{userId}`, making `userId` the explicit owner, aligning with Path-Based ownership. Access is strictly `request.auth.uid == userId`.\n2.  **User-Owned Hierarchical Data:** `DeepfakeDetectionEvent` and `UserReport` entities are nested under their respective `UserProfile` (`/userProfiles/{userId}/deepfakeDetectionEvents/{eventId}` and `/userProfiles/{userId}/userReports/{reportId}`). This hierarchical path intrinsically links the data to its owner. For `list` operations (Query Against Paths - QAPs), a user can only query their own subcollection (e.g., `/userProfiles/myUserId/deepfakeDetectionEvents`). The security rules can then easily enforce `request.auth.uid == userId` (from the path) AND `resource.data.userId == userId` (from the denormalized field), guaranteeing that a user can only list their own events/reports. This prevents unauthorized access and ensures that rules are not used as filters after data retrieval.\n3.  **Global Roles (DBAC):** Not directly implemented in entities, but `ScamSignature` is designed for global read access (backend-controlled write), which is a form of global access. Any specific admin roles would reside in dedicated collections (e.g., `/roles_admin/{uid}`) if needed, relying solely on `request.auth.uid` for checks, not custom claims.\n\n**Data Clarity and Predictability (Mandate D):**\n*   Descriptive wildcards like `{userId}`, `{signatureId}`, `{eventId}`, `{reportId}` are used for clarity.\n*   The `status` field in `UserReport` explicitly models the report's lifecycle, adhering to explicit state modeling. All authorization fields are standardized (e.g., `userId` for ownership).\n\nThis robust structure directly addresses all core design principles and mandates, leading to a secure, performant, and maintainable Firestore database for Vishwaas Guard."
   }
 }

@@ -3,65 +3,92 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * VISHWAAS GUARD SECURITY RULES
+     * Vishwaas Guard Security Rules
      *
-     * Core Philosophy:
-     * This ruleset enforces a strict user-ownership model combined with role-based access control 
-     * for administrative tasks. It prioritizes Authorization Independence by using denormalized 
-     * UIDs and path-based wildcards, minimizing the need for expensive cross-document lookups.
+     * CORE PHILOSOPHY:
+     * This ruleset implements a strict User-Ownership model. Most data is private and nested
+     * under the user's specific profile path. This structure ensures that users can only access
+     * and manage their own data while simplifying the authorization logic.
      *
-     * Data Structure:
-     * - /users/{userId}: Private profile data, owned by the authenticated user.
-     * - /users/{userId}/deepfakeAlerts: User-specific alerts, owned by the user.
-     * - /users/{userId}/userReports: Reports submitted by the user, owned by the user.
-     * - /scamSignatures: Global reference patterns, readable by all users, writable by admins.
-     * - /adminRoles: A registry of UIDs with administrative privileges.
+     * DATA STRUCTURE:
+     * - /userProfiles/{userId}: The root document for a user.
+     * - /userProfiles/{userId}/deepfakeDetectionEvents/{eventId}: Private records of detection events.
+     * - /userProfiles/{userId}/userReports/{reportId}: Private records of reports filed by the user.
+     * - /scamSignatures/{signatureId}: Global, read-only data used for identification patterns.
      *
-     * Key Security Decisions:
-     * - Denormalization: The `userId` is stored inside alerts and reports to allow for 
-     *   fast, independent authorization checks without parent lookups.
-     * - DBAC (Database Access Control): Admin permissions are managed via document existence 
-     *   in the /adminRoles collection rather than custom claims.
-     * - Resource-Specific Roles: Global data (scam signatures) allows authenticated reads 
-     *   for real-time detection while locking down modifications to verified admins.
+     * KEY SECURITY DECISIONS:
+     * 1. Authorization Independence: Critical fields like 'userId' are denormalized onto child 
+     *    documents. This allows rules to verify ownership by comparing the auth UID, the path 
+     *    wildcard, and the internal document data without expensive get() calls.
+     * 2. Structural Segregation: Public detection patterns (ScamSignatures) are separated from 
+     *    private user data to prevent accidental exposure and simplify list operations.
+     * 3. Prototyping Flexibility: While ownership is strictly enforced, data types and specific
+     *    object schemas are not validated to allow for rapid frontend development and iteration.
+     * 4. Immutable Identity: Relational fields (like userId) are enforced as immutable during 
+     *    updates to prevent a document from being "re-assigned" to a different user.
      */
 
-    /**
-     * @description Rules for the UserProfile collection. Users can only manage their own profile.
-     * @path /users/{userId}
-     * @allow (get, list, create, update, delete) if the auth UID matches the userId wildcard.
-     * @deny (any) if the auth UID does not match the userId wildcard or if unauthenticated.
-     * @principle Enforces path-based ownership and validates internal ID consistency.
+    // --- Helper Functions ---
+
+    /** Checks if the request is from an authenticated user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** Checks if the provided ID matches the authenticated user's UID. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** 
+     * Checks if the user is the owner and the document exists. 
+     * Used for update and delete operations. 
      */
-    match /users/{userId} {
-      allow get, list: if isOwner(userId);
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for the UserProfile collection. Users can only see and manage their own profile.
+     * @path /userProfiles/{userId}
+     * @allow (get, create) Authenticated user with UID matching the {userId} wildcard.
+     * @deny (list) Requests for documents where the UID does not match the wildcard.
+     * @principle Enforces path-based ownership and self-creation.
+     */
+    match /userProfiles/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
       allow create: if isOwner(userId) && request.resource.data.id == userId;
       allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
       allow delete: if isExistingOwner(userId);
 
       /**
-       * @description DeepfakeAlerts nested under a user. Denormalized userId ensures independence.
-       * @path /users/{userId}/deepfakeAlerts/{alertId}
-       * @allow (create) if user owns the path and sets the userId field correctly.
-       * @deny (update) if attempting to change the ownership field (userId).
-       * @principle Authorization Independence via denormalized ownership fields.
+       * @description Records of deepfake detection analysis linked to a specific user.
+       * @path /userProfiles/{userId}/deepfakeDetectionEvents/{eventId}
+       * @allow (list, create) User querying or adding to their own subcollection.
+       * @deny (create) Mismatched internal userId field compared to the path wildcard.
+       * @principle Authorization independence via internal field validation.
        */
-      match /deepfakeAlerts/{alertId} {
-        allow get, list: if isOwner(userId);
+      match /deepfakeDetectionEvents/{eventId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
         allow create: if isOwner(userId) && request.resource.data.userId == userId;
         allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
         allow delete: if isExistingOwner(userId);
       }
 
       /**
-       * @description UserReports nested under a user. 
-       * @path /users/{userId}/userReports/{reportId}
-       * @allow (list) if the owner is viewing their own report history.
-       * @deny (create) if the report's internal userId doesn't match the path.
-       * @principle Ensures relational integrity between the path and the document content.
+       * @description Reports submitted by users regarding suspicious activities.
+       * @path /userProfiles/{userId}/userReports/{reportId}
+       * @allow (get, list, create) User managing their own incident reports.
+       * @deny (update) Attempting to change the userId field of an existing report.
+       * @principle Structural segregation of private user data.
        */
       match /userReports/{reportId} {
-        allow get, list: if isOwner(userId);
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
         allow create: if isOwner(userId) && request.resource.data.userId == userId;
         allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
         allow delete: if isExistingOwner(userId);
@@ -69,51 +96,16 @@ service cloud.firestore {
     }
 
     /**
-     * @description Global ScamSignature collection. Essential for detection logic.
+     * @description Global characteristics and patterns for identifying scams.
      * @path /scamSignatures/{signatureId}
-     * @allow (get, list) for any signed-in user.
-     * @allow (create, update, delete) restricted to accounts in the adminRoles collection.
-     * @principle Public authenticated reads with restricted administrative writes.
+     * @allow (get, list) All users, including unauthenticated users, to facilitate detection logic.
+     * @deny (create, update, delete) Any client-side write operations.
+     * @principle Public read access for shared utility data; administrative control for writes.
      */
     match /scamSignatures/{signatureId} {
-      allow get, list: if isSignedIn();
-      allow create: if isAdmin();
-      allow update, delete: if resource != null && isAdmin();
+      allow get, list: if true;
+      allow create, update, delete: if false; // Managed by backend service/administrator
     }
 
-    /**
-     * @description Registry for administrative users.
-     * @path /adminRoles/{adminId}
-     * @allow (get) to check role status.
-     * @deny (list, write) for standard users. Writes are typically handled via console or cloud functions.
-     * @principle Existence-based role management (DBAC).
-     */
-    match /adminRoles/{adminId} {
-      allow get: if isSignedIn();
-      allow list: if isAdmin();
-      allow create, update, delete: if false; // System/Console managed for security
-    }
-
-    // --- Helper Functions ---
-
-    /** Checks if the user is authenticated with Firebase. */
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    /** Checks if the authenticated user's UID matches the provided userId. */
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    /** Checks if a document exists and the current user is the owner. Used for safe updates/deletes. */
-    function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
-    }
-
-    /** Checks if the current user has a document in the adminRoles collection. */
-    function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/adminRoles/$(request.auth.uid));
-    }
   }
 }
