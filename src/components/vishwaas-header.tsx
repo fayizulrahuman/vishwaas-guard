@@ -1,8 +1,7 @@
-
 'use client';
 
 import { useState } from "react"
-import { Shield, Bell, User, LogOut, Settings, Vault, Fingerprint, Mic, ScanFace, TrendingUp, Sparkles, FileAudio, FileVideo } from "lucide-react"
+import { Shield, Bell, User, LogOut, Settings, Vault, Fingerprint, TrendingUp, FileAudio, FileVideo } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { 
@@ -62,8 +61,6 @@ export function VishwaasHeader() {
   const handleSignOut = () => {
     toast({ title: "Secure Wipe Initiated", description: "Clearing local cache and buffers..." });
     setTimeout(() => {
-      localStorage.clear();
-      sessionStorage.clear();
       signOut(auth);
       toast({ title: "Session Purged", description: "Your biometric session has been decommissioned." });
     }, 1000);
@@ -78,7 +75,7 @@ export function VishwaasHeader() {
             <Shield className="h-5 w-5 md:h-8 md:w-8 text-primary relative z-10 drop-shadow-[0_0_10px_rgba(0,102,255,0.8)]" />
           </div>
           <div className="flex flex-col">
-            <span className="text-base md:text-2xl tracking-tighter uppercase font-black leading-none">Vishwaas Guard</span>
+            <span className="text-base md:text-2xl tracking-tighter uppercase font-black leading-none text-white">Vishwaas Guard</span>
             <span className="hidden sm:inline text-[7px] md:text-[9px] uppercase tracking-[0.5em] text-[#8E8E93] mt-1">Intelligence Perimeter</span>
           </div>
         </div>

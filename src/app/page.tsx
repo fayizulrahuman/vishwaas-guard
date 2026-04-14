@@ -18,8 +18,10 @@ export default function Home() {
   const [scrollY, setScrollY] = useState(0);
   const [isAuditing, setIsAuditing] = useState(false);
   const [auditResult, setAuditResult] = useState<SecurityAuditOutput | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const handleScroll = () => {
       setScrollY(window.scrollY);
     };
@@ -58,7 +60,7 @@ export default function Home() {
           {/* Hero Section */}
           <section 
             className="space-y-8 md:space-y-12 transition-all duration-300"
-            style={{ transform: typeof window !== 'undefined' && window.innerWidth > 768 ? `translateY(${-parallaxY}px)` : 'none' }}
+            style={{ transform: (isMounted && typeof window !== 'undefined' && window.innerWidth > 768) ? `translateY(${-parallaxY}px)` : 'none' }}
           >
             <div className="space-y-4 max-w-3xl">
               <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-[1.1] md:leading-[1.05]">
@@ -182,7 +184,7 @@ export default function Home() {
                 <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/20">
                   <Shield className="h-5 w-5 text-primary" />
                 </div>
-                <span className="text-lg tracking-tighter uppercase">Vishwaas Guard</span>
+                <span className="text-lg tracking-tighter uppercase text-white">Vishwaas Guard</span>
               </div>
               <p className="text-xs md:text-sm text-[#8E8E93] leading-relaxed font-medium">
                 The global standard for deepfake resilience and biometric communication integrity.
