@@ -50,12 +50,13 @@ export function AuthScreen() {
       }
     } catch (error: any) {
       let description = "Please check your credentials and try again.";
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') {
         description = isSignUp 
-          ? "This identity may already exist. Try signing in." 
-          : "Identity not found. If you are new, click 'Request New Security ID' below.";
+          ? "Creation failed. Please use a valid email and strong security key." 
+          : "Identity not found. If you are new, click 'REQUEST NEW SECURITY ID' below.";
       } else if (error.code === 'auth/email-already-in-use') {
-        description = "This identity is already registered. Try signing in.";
+        description = "This identity is already registered. Try signing in instead.";
+        setIsSignUp(false); // Help the user by switching to sign-in
       } else if (error.code === 'auth/weak-password') {
         description = "Security key must be at least 6 characters.";
       }
@@ -82,7 +83,7 @@ export function AuthScreen() {
             </div>
           </div>
           <div className="space-y-2">
-            <h1 className="text-4xl font-black text-white tracking-tighter uppercase leading-none">Vishwaas Guard</h1>
+            <h1 className="text-4xl font-black text-white tracking-tighter uppercase leading-none text-glow">Vishwaas Guard</h1>
             <p className="text-[#8E8E93] text-[10px] font-black uppercase tracking-[0.4em]">Integrity. Filtered by Glass.</p>
           </div>
         </div>
@@ -94,7 +95,7 @@ export function AuthScreen() {
               {method === 'options' ? "Secure Entry" : (isSignUp ? "Create Identity" : "Access Perimeter")}
             </CardTitle>
             <CardDescription className="text-center text-[#8E8E93] font-medium px-4 text-sm mt-2">
-              {isSignUp ? "Register your encrypted identity." : "Choose your cryptographic verification method."}
+              {isSignUp ? "Define your new encrypted identity." : "Choose your cryptographic verification method."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pb-12">
@@ -178,11 +179,11 @@ export function AuthScreen() {
                     onClick={() => {
                       setIsSignUp(!isSignUp);
                       toast({
-                        title: isSignUp ? "Switching to Access" : "Switching to Creation",
-                        description: isSignUp ? "Enter your existing credentials." : "Define your new security identity.",
+                        title: !isSignUp ? "Identity Creation" : "Identity Verification",
+                        description: !isSignUp ? "Register your new security identity." : "Sign in with your existing credentials.",
                       });
                     }}
-                    className="text-[10px] text-primary font-black uppercase tracking-[0.3em] hover:opacity-80 transition-opacity py-2"
+                    className={`text-[11px] font-black uppercase tracking-[0.3em] transition-all py-2 border-b-2 ${isSignUp ? 'text-[#8E8E93] border-transparent hover:text-white' : 'text-primary border-primary hover:opacity-80'}`}
                   >
                     {isSignUp ? "Existing Identity? Access" : "Request New Security ID"}
                   </button>
