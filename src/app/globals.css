@@ -40,7 +40,7 @@
 
 /* --- Glassmorphism Core --- */
 .frosted-glass {
-  @apply bg-white/5 backdrop-blur-[15px] border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)];
+  @apply bg-white/5 backdrop-blur-[20px] border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)];
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
@@ -115,6 +115,15 @@
   10% { opacity: 1; }
   90% { opacity: 1; }
   100% { top: 100%; opacity: 0; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
