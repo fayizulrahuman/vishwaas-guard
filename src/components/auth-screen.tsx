@@ -28,7 +28,7 @@ export function AuthScreen() {
     } catch (error: any) {
       let description = error.message;
       if (error.code === 'auth/popup-blocked') {
-        description = "Authentication popup blocked. Please allow popups for this site in your browser settings or try using Email login.";
+        description = "Authentication popup blocked. Please allow popups for this site.";
       }
       toast({
         title: "Login Failed",
@@ -47,14 +47,18 @@ export function AuthScreen() {
     
     try {
       if (isSignUp) {
-        initiateEmailSignUp(auth, email, password);
+        await initiateEmailSignUp(auth, email, password);
       } else {
-        initiateEmailSignIn(auth, email, password);
+        await initiateEmailSignIn(auth, email, password);
       }
     } catch (error: any) {
       let description = "Please check your credentials and try again.";
       if (error.code === 'auth/invalid-credential') {
-        description = "The identity identifier or security key provided is incorrect. Please verify your details.";
+        description = "The identity identifier or security key provided is incorrect.";
+      } else if (error.code === 'auth/email-already-in-use') {
+        description = "This identity identifier is already registered.";
+      } else if (error.code === 'auth/weak-password') {
+        description = "The security key must be at least 6 characters.";
       }
       toast({
         title: "Verification Error",
@@ -62,21 +66,27 @@ export function AuthScreen() {
         variant: "destructive"
       });
     } finally {
-      // Note: In non-blocking login, auth state change handles the actual UI transition
-      // We set loading false here as a fallback or if using regular await pattern
       setLoading(false);
     }
   };
 
-  const handleGuestLogin = () => {
+  const handleGuestLogin = async () => {
     setLoading(true);
-    initiateAnonymousSignIn(auth);
-    // Loading will be handled by auth state listener in the provider
+    try {
+      await initiateAnonymousSignIn(auth);
+    } catch (error: any) {
+      toast({
+        title: "Guest Access Failed",
+        description: "Could not establish an anonymous session.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black p-4 md:p-6 relative overflow-hidden">
-      {/* Volumetric Background Spheres */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="bg-sphere sphere-blue -top-40 -left-40 animate-float" style={{ animationDelay: '0s' }}></div>
         <div className="bg-sphere sphere-blue top-1/3 -right-20 animate-float opacity-30" style={{ animationDelay: '-3s' }}></div>
